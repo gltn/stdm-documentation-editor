@@ -1,0 +1,1 @@
+var html_file = {'title': "What's New in STDM Version 1.5?", 'img_param': 'image_path', 'current': '1_5/en/what_is_new.htm', 'full_img_path': 'C:\\Users\\Wondim\\.qgis2\\python\\plugins\\sde\\docs\\1_5\\en/images', 'doc_path': '1_5/en', 'images_folder': 'images', 'relative_img_path': '1_5/en/images'};

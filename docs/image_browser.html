@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery_1_10_2_min.js"></script>
+    <script src="gallery_list.js"></script>
+</head>
+
+<body>
+<ul>
+
+</ul>
+<script>
+    var load_images = function () {
+        $(document).ready(function () {
+            $.getJSON('gallery_list.js', function (data) {
+
+                $.each(data, function (i, f) {
+                    $("ul").append('<img src="' + f.url + '" alt="' + f.name + '" ' +
+                        'style="width:120px;">');
+                });
+            });
+        });
+    };
+    load_images()
+</script>
+</body>
+</html>
