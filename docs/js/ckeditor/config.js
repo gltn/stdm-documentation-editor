@@ -43,6 +43,7 @@ CKEDITOR.editorConfig = function(config) {
     config.extraAllowedContent = 'p(mso*,Normal)';
     //config.pasteFilter = null;
     config.pasteFilter = 'h1 h2 h3 h4 h5 h6 h7 p ul ol li; img[!src, alt]; a[!href]';
+    config.removeButtons='Flash,Smiley';
 // config.htmlEncodeOutput = false;
 // config.entities = false;
 // config.basicEntities = false;
