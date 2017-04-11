@@ -74,12 +74,13 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.toc = None
         self.prev_language_code = None
         self.prev_language_name = None
-        self.prev_toc_index = None
-
+        self._prev_file_path = None
+        self.current_document = None
         self._current_file = None
         self.init_gui()
         self.on_editor_loaded()
         self.on_show_gallery()
+        self.content_editor.dropEvent = self.on_help_editor_item_drop
         # Start with the first page if current_file.js doesn't exist
         if not os.path.isfile(CURRENT_FILE):
             self.set_current_file('preface.htm')
@@ -98,6 +99,24 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 self.current_item = self.toc.widget_items[
                     os.path.basename(curr_path)
                 ]
+
+    def on_help_editor_item_drop(self, event):
+        html = str(event.mimeData().html())
+        image_name = str(event.mimeData().text())
+        correct_src = 'src="{}/{}/{}"'.format(
+            self.language_doc, IMAGES, image_name
+        )
+        # remove absolute url
+        fixed_html = re.sub(r"src=\"\S+", correct_src, html)
+        # remove style
+        fixed_html = re.sub(r'style\S+\"', '', fixed_html)
+        js = """
+                  jQuery(document).ready(function() {
+                      jQuery(document).trigger('customDropEvent', '%s');
+                  });
+              """ % fixed_html
+        QApplication.processEvents()
+        self.web_frame.evaluateJavaScript(QString(js))
 
     def init_gui(self):
         self.statusbar.hide()
@@ -207,19 +226,28 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             copy_directory(prev_doc_dir, self.full_language_dir)
 
     def on_url_changed(self, url):
+        # # prevent saving on first start.
+        # # the self._prev_file_path is set to equal to _curr_file_path
+        # if self._curr_file_path != self._prev_file_path:
+        #     return
+        # return
         if url.hasFragment():
             data = str(url.fragment())
             # handle saving.
 
             if not data.startswith(IMG_PARAM):
                 # data = data.replace(self.language_doc, '')
+
                 data = re.sub(r"\"/+", '', data)
 
                 full_html = '<html><head><title>{}</title></head>' \
-                            '<body>{}</body></html>'.format(self._curr_title, data)
+                    '<body>{}</body></html>'.format(
+                            self._curr_title, data
+                )
                 formatted_html = format_html(full_html)
 
-                html_file = open('{}/{}'.format(DOC, self._curr_file_path), 'w+')
+                html_file = open(
+                    '{}/{}'.format(DOC, self._curr_file_path), 'w+')
                 html_file.write(formatted_html)
                 html_file.close()
             # upload image
@@ -231,7 +259,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     self.save_local_files([url_data[1]])
 
     def get_item_url(self, item, col=0):
-
+        self._prev_file_path = self._curr_file_path
         current_doc = item.data(col, Qt.UserRole).toString()
         current_title = str(item.text(col))
         QApplication.processEvents()
@@ -240,11 +268,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 return
         self.set_current_file(current_doc, current_title)
         self.current_item = self.toc.widget_items[str(current_doc)]
+
         self.load_content_js()
 
     def set_current_file(self, current_doc, title=None):
-        self._curr_file_path = os.path.join(self.language_doc, str(current_doc))
 
+        self._curr_file_path = os.path.join(self.language_doc, str(current_doc))
         self._curr_file_path = self._curr_file_path.replace('\\', '/')
         if title is None:
             curr_file_path = os.path.join(PLUGIN_DIR, self._curr_file_path)
