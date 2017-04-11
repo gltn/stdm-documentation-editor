@@ -102,6 +102,6 @@ docs/2_1
 .idea
 
 # Dynamically generated .JS files
-docs/current_file.js
-docs/gallery_list.js
-docs/images.js
+!docs/current_file.js
+!docs/gallery_list.js
+!docs/images.js

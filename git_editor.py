@@ -42,20 +42,17 @@ from utils import (
     TABLE_OF_CONTENT_HTML, LANGUAGE_DOC_HTML)
 from ui.add_language import AddLanguage
 
-#**
-from git_editor import GitHelpEditor
-
 class WebPage(QWebPage):
     def javaScriptConsoleMessage(self, msg, line, source):
         print '%s line %d: %s' % (source, line, msg)
 
 
-class HelpEditor(QMainWindow, Ui_HelpEditor):
+class GitHelpEditor(QMainWindow, Ui_HelpEditor):
 
     window_loaded = pyqtSignal()
 
     def __init__(self):
-        
+        print "GitHelpEditor ..." 
         # TODO fix image drag drop small size after tree item click
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -307,7 +304,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         Displays a file dialog for a user to select an image.
         """
         dialog_title = QApplication.translate(
-            "HelpEditor",
+            "GitHelpEditor",
             "Select an Image"
         )
         files = QFileDialog.getOpenFileNames(
