@@ -100,3 +100,8 @@ docs/2_1
 !docs/2_0/**/preface.htm
 !docs/2_1/**/preface.htm
 .idea
+
+# Dynamically generated .JS files
+docs/current_file.js
+docs/gallery_list.js
+docs/images.js
