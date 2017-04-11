@@ -12,7 +12,7 @@ from PyQt4.QtGui import QTreeWidget
 from PyQt4.QtGui import QTreeWidgetItem
 
 from xml_util import XmlUtil
-from utils import (
+from settings import (
 TABLE_OF_CONTENT_HTML,
 TABLE_OF_CONTENT_XML
 )
@@ -42,7 +42,7 @@ class TocTreeMenu(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.itemChanged.connect(self.on_item_changed)
-        self.enable_drag_sort()
+        # self.enable_drag_sort()
     
     def enable_drag_sort(self):
         self.setDragEnabled(True)

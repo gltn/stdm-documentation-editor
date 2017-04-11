@@ -1,11 +1,8 @@
-from __future__ import division
-
+import os
 import re
 import sys
-import os
 from HTMLParser import HTMLParser
-from PyQt4 import QtWebKit
-from uuid import uuid4
+
 from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
@@ -15,13 +12,17 @@ from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtWebKit import QWebSettings, QWebPage
-from xml_util import XmlUtil
-from images import get_images, get_gallery_images
-from ui_help_editor import Ui_HelpEditor
+
+from utils import get_images, get_gallery_images
 from table_of_contents import TocTreeMenu
+from ui.add_language import AddLanguage
+from ui.ui_help_editor import Ui_HelpEditor
 from utils import (
     copy_file,
     copy_directory,
+    format_html
+)
+from settings import (
     IMAGE_TYPES,
     PLUGIN_DIR,
     HELP_EDITOR_HTML,
@@ -33,14 +34,12 @@ from utils import (
     LANGUAGE_DOC,
     LANG_SETTING_FILE,
     HOME,
-    format_html,
     STDM_VERSIONS,
     CURRENT_FILE,
     IMAGE_BROWSER_HTML,
-    LANG_SETTING,
     PREVIEW_URL,
     TABLE_OF_CONTENT_HTML, LANGUAGE_DOC_HTML)
-from ui.add_language import AddLanguage
+from xml_util import XmlUtil
 
 class WebPage(QWebPage):
     def javaScriptConsoleMessage(self, msg, line, source):
@@ -52,7 +51,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
 
     def __init__(self):
-        
+
         # TODO fix image drag drop small size after tree item click
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -76,7 +75,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.prev_language_code = None
         self.prev_language_name = None
         self.prev_toc_index = None
-        self.current_item = None
+
         self._current_file = None
         self.init_gui()
         self.on_editor_loaded()
@@ -84,6 +83,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # Start with the first page if current_file.js doesn't exist
         if not os.path.isfile(CURRENT_FILE):
             self.set_current_file('preface.htm')
+            self.current_item = self.toc.widget_items['preface.htm']
+
         else:
             string = open(CURRENT_FILE, 'r').read()
             list_str = string.split('=')
@@ -94,6 +95,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 curr_path = json_data_final['current']
                 curr_title = json_data_final['title']
                 self.set_current_file(os.path.basename(curr_path), curr_title)
+                self.current_item = self.toc.widget_items[
+                    os.path.basename(curr_path)
+                ]
 
     def init_gui(self):
         self.statusbar.hide()
@@ -377,7 +381,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         index_html_text = index_html_text.replace(
             '<div class="list-group" id="st_side_menu">', new_toc)
         index_file = open(index_html_path, 'w+')
-        print index_html_text
+
         index_file.write(index_html_text)
         url = QUrl()
         url.setUrl(PREVIEW_URL)
