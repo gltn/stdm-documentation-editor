@@ -106,15 +106,15 @@ class XmlUtil():
         data = []
         for i in range(child.length()):
             attribute = OrderedDict()
-            n = child.item(i)
-
-            attribute2 = self.extract_data(n.childNodes())
-            if attribute2 is not None:
-                attribute[(n.toElement().attribute(
-                    'link'), n.toElement().attribute('name'))] = attribute2
+            node = child.item(i)
+            parent_attribute = self.extract_data(node.childNodes())
+            if parent_attribute is not None:
+                parent_link = str(node.toElement().attribute('link'))
+                parent_name = str(node.toElement().attribute('name'))
+                attribute[(parent_link, parent_name)] = parent_attribute
             else:
-                x, y = n.toElement().attribute(
-                    'link'), n.toElement().attribute('name')
-                attribute[x] = y
+                link = str(node.toElement().attribute('link'))
+                name = str(node.toElement().attribute('name'))
+                attribute[link] = name
             data.append(attribute)
         return data

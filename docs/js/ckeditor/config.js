@@ -31,19 +31,13 @@ CKEDITOR.editorConfig = function(config) {
 	];
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;h4;h5';
-
 	config.extraPlugins = 'image2,simple-image-browser,zoom,pastefromword';
-	// config.pasteFromWordCleanupFile = true;
-	// config.pasteFromWordPromptCleanup = true;
-	// config.pasteFromWordRemoveFontStyles = true;
 	config.forcePasteAsPlainText = false;
     config.pasteFromWordRemoveFontStyles = true;
     config.pasteFromWordRemoveStyles = false;
     config.allowedContent = true;
     config.extraAllowedContent = 'p(mso*,Normal)';
-    //config.pasteFilter = null;
     config.pasteFilter = 'h1 h2 h3 h4 h5 h6 h7 p ul ol li; img[!src, alt]; a[!href]';
-// config.htmlEncodeOutput = false;
-// config.entities = false;
-// config.basicEntities = false;
+	config.removeButtons = 'About,Smiley,Flash,Preview,Print,Styles,Maximize,';
+	config.font_names = 'Cambria;Arial/Arial, Helvetica;';//Times New Roman/Times New Roman, Times, serif;Verdana';
 };

@@ -43,31 +43,33 @@ function get_url_param_value(name) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 function find_next_file(image_path) {
+    var next_number;
     var image_name = image_path.split('/').reverse()[0];
     var ext = image_name.substr(image_name.lastIndexOf('.') + 1);
     var _img = image_name.substr(0, image_name.lastIndexOf('.'));
-
+    var matched = [];
     $.getJSON('gallery_list.js', function (data) {
-        var matched = [];
         $.each(data, function (url, img) {
             var name = img.name;
             if (name.indexOf(_img) >= 0 && name.indexOf(ext) >= 0) {
 
                 matched.push(name);
             }
-
         });
-
-        var next_number = matched[0].split(_img)[1];
+        next_number = matched[0].split(_img)[1];
         next_number = next_number.split(ext)[0];
         next_number = next_number.split('_')[1];
         next_number = next_number.split('.')[0];
         next_number = parseInt(next_number) + 1;
-        console.log(next_number);
-        console.log(_img + '_' + next_number + '.' + ext);
-        return _img + '_' + next_number + '.' + ext;
 
     });
+    if (matched.length < 1){
+            return image_name
+    }
+    else {
+        console.log(_img + '_' + next_number + '.' + ext);
+        return _img + '_' + next_number + '.' + ext;
+    }
 }
 function img_absolute_to_relative(evt) {
     var elem = document.createElement("div");
@@ -89,15 +91,16 @@ function img_absolute_to_relative(evt) {
         }
         // handle paste from word
         else {
-            console.log(old_src);
-            var next_file = find_next_file(old_src);
+            var next_file;
             var src_urls = old_src.split('file:///');
             if (src_urls.length > 1) {
+                next_file = find_next_file(old_src);
+                console.log(old_src);
+                console.log(next_file);
                 var src_url = src_urls[1];
-                console.log(src_urls);
+                console.log(src_url);
                 // send the url to python
-                window.location.hash =
-                    html_file.img_param + '=' + src_url;
+                window.location.hash = html_file.img_param + '=' + src_url;
                 var new_upload_src =
                     html_file.relative_img_path + '/' + next_file;
 
@@ -105,7 +108,6 @@ function img_absolute_to_relative(evt) {
                     (evt.data.dataValue).toString(), old_src, new_upload_src
                 );
             }
-
         }
     }
     //Disallow anchors for table of content and empty links
@@ -145,14 +147,22 @@ function prod_to_dev_image_url(html_data, body) {
 
     var images = elem.getElementsByTagName("img");
     for (var i = 0; i < images.length; i++) {
-        var img_name = images[i].src.toString().split('/').reverse()[0];
-
-        img_name = img_name.replace('%22', '').replace('%22', '');
-        images[i].src = html_data.relative_img_path + '/' + img_name;
-
+        if (!is_url(images[i].src)){
+            var img_name = images[i].src.toString().split('/').reverse()[0];
+            img_name = img_name.replace('%22', '').replace('%22', '');
+            images[i].src = html_data.relative_img_path + '/' + img_name;
+        }
     }
     return elem.innerHTML
-
+}
+function is_url(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return pattern.test(str);
 }
 function load_content(html_data) {
 
@@ -160,6 +170,7 @@ function load_content(html_data) {
         var body = content.replace(/^[\S\s]*<body[^>]*?>/i, "")
             .replace(/<\/body[\S\s]*$/i, "");
         body = prod_to_dev_image_url(html_data, body);
+
         editor.setData(body);
 
     });
