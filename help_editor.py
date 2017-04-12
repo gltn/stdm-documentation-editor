@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import sys
@@ -39,7 +40,7 @@ from settings import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     TABLE_OF_CONTENT_HTML, LANGUAGE_DOC_HTML)
-from xml_util import XmlUtil
+
 
 class WebPage(QWebPage):
     def javaScriptConsoleMessage(self, msg, line, source):
@@ -54,13 +55,16 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
         # TODO fix image drag drop small size after tree item click
         QMainWindow.__init__(self)
+
         self.setupUi(self)
         self._curr_file_path = None
+        self._curr_file_path_js = None
         self._curr_title = None
         get_images(LANGUAGE_DOC)
         get_gallery_images(LANGUAGE_DOC)
         self.help_path = os.path.join(PLUGIN_DIR, HELP_EDITOR_HTML)
         self.web_frame = self.content_editor.page().currentFrame()
+        self.on_editor_loaded()
         self.current_lang_name = 'English'
         self.current_lang_code = 'en'
         # page = WebPage()
@@ -78,27 +82,37 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.current_document = None
         self._current_file = None
         self.init_gui()
-        self.on_editor_loaded()
+
         self.on_show_gallery()
         self.content_editor.dropEvent = self.on_help_editor_item_drop
         # Start with the first page if current_file.js doesn't exist
-        if not os.path.isfile(CURRENT_FILE):
-            self.set_current_file('preface.htm')
+        print self._current_file
+        if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
             self.current_item = self.toc.widget_items['preface.htm']
-
+            title = str(self.current_item.text(0))
+            self.set_current_file('preface.htm', title)
+            self.toc.setCurrentItem(self.current_item)
         else:
-            string = open(CURRENT_FILE, 'r').read()
-            list_str = string.split('=')
-            if len(list_str) > 1:
-                json_data = list_str[1].strip().rstrip(';')
+            self.read_current_file()
+            self.toc.expandItem(self.current_item.parent())
+            self.toc.setCurrentItem(self.current_item)
+            self.setWindowTitle(
+                'STDM Documentation Editor -{}'.format(self._curr_title)
+            )
 
-                json_data_final = eval(json_data)
-                curr_path = json_data_final['current']
-                curr_title = json_data_final['title']
-                self.set_current_file(os.path.basename(curr_path), curr_title)
-                self.current_item = self.toc.widget_items[
-                    os.path.basename(curr_path)
-                ]
+    def read_current_file(self):
+        string = open(CURRENT_FILE, 'r').read()
+        list_str = string.split('=')
+        if len(list_str) > 1:
+            json_data = list_str[1].strip().rstrip(';')
+            json_data_final = eval(json_data)
+            self._curr_file_path = json_data_final['current']
+            self._curr_file_path_js = json_data_final['current_js']
+            self._curr_title = json_data_final['title']
+            self.language_doc = json_data_final['doc_path']
+            self.current_item = self.toc.widget_items[
+                os.path.basename(self._curr_file_path)
+            ]
 
     def on_help_editor_item_drop(self, event):
         html = str(event.mimeData().html())
@@ -111,10 +125,10 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # remove style
         fixed_html = re.sub(r'style\S+\"', '', fixed_html)
         js = """
-                  jQuery(document).ready(function() {
-                      jQuery(document).trigger('customDropEvent', '%s');
-                  });
-              """ % fixed_html
+              jQuery(document).ready(function() {
+                  jQuery(document).trigger('customDropEvent', '%s');
+              });
+        """ % fixed_html
         QApplication.processEvents()
         self.web_frame.evaluateJavaScript(QString(js))
 
@@ -226,18 +240,10 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             copy_directory(prev_doc_dir, self.full_language_dir)
 
     def on_url_changed(self, url):
-        # # prevent saving on first start.
-        # # the self._prev_file_path is set to equal to _curr_file_path
-        # if self._curr_file_path != self._prev_file_path:
-        #     return
-        # return
         if url.hasFragment():
             data = str(url.fragment())
             # handle saving.
-
             if not data.startswith(IMG_PARAM):
-                # data = data.replace(self.language_doc, '')
-
                 data = re.sub(r"\"/+", '', data)
 
                 full_html = '<html><head><title>{}</title></head>' \
@@ -250,11 +256,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     '{}/{}'.format(DOC, self._curr_file_path), 'w+')
                 html_file.write(formatted_html)
                 html_file.close()
+                json_data = json.dumps([formatted_html], ensure_ascii=False)
+                js_file = open(
+                    '{}/{}'.format(DOC, self._curr_file_path_js), 'w+')
+                js_file.write('var doc = {};'.format(json_data))
+                js_file.close()
             # upload image
             else:
-
                 url_data = data.split('{}='.format(IMG_PARAM))
-
                 if len(url_data) > 0:
                     self.save_local_files([url_data[1]])
 
@@ -268,28 +277,26 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 return
         self.set_current_file(current_doc, current_title)
         self.current_item = self.toc.widget_items[str(current_doc)]
-
+        self.setWindowTitle(
+            'STDM Documentation Editor -{}'.format(self._curr_title)
+        )
+        self.content_editor.blockSignals(True)
         self.load_content_js()
+        self.content_editor.blockSignals(False)
 
     def set_current_file(self, current_doc, title=None):
 
         self._curr_file_path = os.path.join(self.language_doc, str(current_doc))
         self._curr_file_path = self._curr_file_path.replace('\\', '/')
-        if title is None:
-            curr_file_path = os.path.join(PLUGIN_DIR, self._curr_file_path)
-            curr_file = open(curr_file_path, 'r')
-            html = curr_file.read()
-            xml_util = XmlUtil(curr_file_path)
-            self._curr_title = xml_util.html_title()
-            parser = HTMLParser()
-            html_parser = HTMLParser.feed(parser, html)
-            if html_parser.handle_endtag('title'):
-                self._curr_title = html_parser.handle_data(html)
-        else:
-            self._curr_title = title
+        self._curr_title = title
+        file_name = os.path.basename(self._curr_file_path).split('.')[0]
+        self._curr_file_path_js = '{}/{}.js'.format(self.language_doc,
+                                                    file_name)
         output_file = open(CURRENT_FILE, 'w+')
+
         self._current_file = {
             "current": str(self._curr_file_path),
+            'current_js': self._curr_file_path_js,
             'doc_path': self.language_doc, 'title': title,
             'full_img_path': '{}/{}'.format(self.full_language_dir, IMAGES),
             'relative_img_path': '{}/{}'.format(self.language_doc, IMAGES),
@@ -363,10 +370,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
     def populate_languages(self):
         for code, language in LANGUAGES.iteritems():
-            self.language_cbo.addItem(language, code)
+            doc_dir = os.path.join(PLUGIN_DIR, DOC, self.current_version, code)
+            if os.path.isdir(doc_dir):
+                self.language_cbo.addItem(language, code)
 
     def on_add_language(self):
-        add_language = AddLanguage(self)
+        add_language = AddLanguage(self.current_version, self)
         result = add_language.exec_()
         if result:
             lang_name = str(add_language.name.text()).strip()
@@ -389,29 +398,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
     def on_preview_in_browser(self):
         service = QDesktopServices()
 
-        index_html_path = '{}/index.html'.format(DOC)
-        # print open(index_html_path, 'r').closed
-        # if not open(index_html_path, 'r').closed:
-        #     return
-        index_file = open(index_html_path, 'r')
-        toc = '{}/{}'.format(LANGUAGE_DOC_HTML, TABLE_OF_CONTENT_HTML)
-        toc_file = open(toc, 'r')
-        toc_text = toc_file.read()
-        toc_file.close()
-        index_html_text = index_file.read()
-
-        index_file.close()
-        new_toc = '{}{}'.format(
-            '<div class="list-group" id="st_side_menu">', toc_text)
-        # index_html_text = format_html(index_html_text)
-        if new_toc in index_html_text:
-
-            return
-        index_html_text = index_html_text.replace(
-            '<div class="list-group" id="st_side_menu">', new_toc)
-        index_file = open(index_html_path, 'w+')
-
-        index_file.write(index_html_text)
         url = QUrl()
         url.setUrl(PREVIEW_URL)
         service.openUrl(url)
