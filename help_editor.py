@@ -43,7 +43,6 @@ from utils import (
 from ui.add_language import AddLanguage
 
 #**
-from git_editor import GitHelpEditor
 
 class WebPage(QWebPage):
     def javaScriptConsoleMessage(self, msg, line, source):
@@ -388,6 +387,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = GitHelpEditor()
+    window = HelpEditor()
     window.show()
     sys.exit(app.exec_())
