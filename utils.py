@@ -1,3 +1,7 @@
+#!C:/Python27/python.exe
+import glob
+import json
+import os
 import os
 import re
 import shutil
@@ -8,41 +12,67 @@ from xml.dom import minidom
 import json
 import sys
 
-PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
-LANG_SETTING_FILE = '{}\languages.txt'.format(PLUGIN_DIR)
-LANG_FILE = open(LANG_SETTING_FILE, 'r')
-LANG_SETTING = LANG_FILE.read()
-
+from settings import (
+    IMAGE_TYPES,
+    LANGUAGE_DOC,
+    IMAGES,
+    DOC,
+    GALLERY_LIST_JS,
+    IMAGE_JS
+)
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-decoder = json.JSONDecoder(object_pairs_hook=OrderedDict)
 
-LANGUAGES = decoder.decode(LANG_SETTING)
-LANG_FILE.close()
-LANGUAGE = 'en'
+def get_images(lang_doc):
+    doc_dir = os.path.dirname(os.path.abspath(__file__))
+    image_dir = os.path.join(doc_dir, '{}/{}/{}'.format(DOC, lang_doc, IMAGES))
+    images = []
 
-IMAGES = 'images'
-IMG_PARAM = 'image_path'
-IMAGE_TYPES = {'png': '*.png', 'jpg': '*.jpg', 'tif': '*.tif', 'bmp': '*.bmp', 'svg': '*.svg'}
-DOC = 'docs'
-HELP_EDITOR_HTML = '{}/help.html'.format(DOC)
-CURRENT_FILE = '{}/current_file.js'.format(DOC)
-IMAGE_BROWSER_HTML = '{}/image_browser.html'.format(DOC)
-GALLERY_LIST_JS = '{}/gallery_list.js'.format(DOC)
-IMAGE_JS = '{}/images.js'.format(DOC)
-DEFAULT_VERSION = '1_5'
-LANGUAGE_DOC = '{}/{}'.format(DEFAULT_VERSION, LANGUAGE)
-PREVIEW_URL = '{}/{}/index.html'.format(PLUGIN_DIR, DOC)
-LANGUAGE_DOC_HTML = '{}/{}/{}'.format(PLUGIN_DIR, DOC, LANGUAGE_DOC)
-STDM_VERSIONS = OrderedDict([('1_5', 'STDM 1.5'), ('2_0', 'STDM 2.0'),
-                             ('2_1', 'STDM 2.1')
-                             ])
-TABLE_OF_CONTENT_HTML = 'table_of_contents.html'
+    for dir_path, sub_dirs, files in os.walk(image_dir):
+        for type in IMAGE_TYPES.values():
+            image_paths = glob.glob('{}/{}'.format(dir_path, type))
+            image_paths.sort(key=lambda x: os.path.getmtime(x))
+            image_paths = reversed(image_paths)
+            for image_path in image_paths:
+                relative_path = os.path.relpath(image_path, doc_dir)
+                relative_path = relative_path.replace('\\', '/').replace(
+                    '{}/'.format(DOC), ''
+                )
 
-TABLE_OF_CONTENT_XML = 'table_of_contents.xml'
-HOME = expanduser("~")
+                images.append({"url": relative_path})
+    json_data = json.dumps(images)
+    with open(IMAGE_JS, 'w+') as outfile:
+        print >> outfile, json_data
+
+
+def get_gallery_images(lang_dir):
+    doc_dir = os.path.dirname(os.path.abspath(__file__))
+    image_dir = os.path.join(doc_dir, '{}/{}/{}'.format(DOC, lang_dir, IMAGES))
+    images = []
+
+    for dir_path, sub_dirs, files in os.walk(image_dir):
+        for type in IMAGE_TYPES.values():
+            image_paths = glob.glob('{}/{}'.format(dir_path, type))
+            image_paths.sort(key=lambda x: os.path.getmtime(x))
+            image_paths = reversed(image_paths)
+            for image_path in image_paths:
+                relative_path = os.path.relpath(image_path, doc_dir)
+                relative_path = relative_path.replace('\\', '/').replace(
+                    '{}/'.format(DOC), ''
+                )
+
+                images.append(
+                    {"url": relative_path,
+                     "name": os.path.basename(image_path)
+                    }
+                )
+    json_data = json.dumps(images)
+    with open(GALLERY_LIST_JS, 'w+') as outfile:
+        print >> outfile, json_data
+
+# print(json.JSONEncoder().encode(get_images(LANGUAGE_DOC)))
 
 
 def format_html(full_html_text):

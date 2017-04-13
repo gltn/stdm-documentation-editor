@@ -1,3 +1,4 @@
+import json
 import os
 
 import time
@@ -12,10 +13,10 @@ from PyQt4.QtGui import QTreeWidget
 from PyQt4.QtGui import QTreeWidgetItem
 
 from xml_util import XmlUtil
-from utils import (
-TABLE_OF_CONTENT_HTML,
-TABLE_OF_CONTENT_XML
-)
+from settings import (
+    TABLE_OF_CONTENT_HTML,
+    TABLE_OF_CONTENT_XML,
+    LANGUAGE, PLUGIN_DIR, DOC, DEFAULT_VERSION, TABLE_OF_CONTENT_JS)
 
 
 class TocTreeMenu(QTreeWidget):
@@ -29,6 +30,7 @@ class TocTreeMenu(QTreeWidget):
         )
         self.xml_util = XmlUtil(self.contents_xml_path)
         self.contents_data = self.xml_util.xml_point_attributes('toc')
+
         self.memory_toc_html = cStringIO.StringIO()
 
         if self.contents_data is None:
@@ -38,11 +40,18 @@ class TocTreeMenu(QTreeWidget):
         self.contents_html_path = '{}/{}'.format(
             current_lang_path, TABLE_OF_CONTENT_HTML
         )
-        self.save_table_of_contents(self.contents_data)
+        self.contents_html_path = '{}/{}'.format(
+            current_lang_path, TABLE_OF_CONTENT_HTML
+        )
+        self.contents_js_path = '{}/{}'.format(
+            current_lang_path, TABLE_OF_CONTENT_JS
+        )
+        self.update_contents_path(self.curr_language_path)
+
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.itemChanged.connect(self.on_item_changed)
-        self.enable_drag_sort()
+        # self.enable_drag_sort()
     
     def enable_drag_sort(self):
         self.setDragEnabled(True)
@@ -77,6 +86,15 @@ class TocTreeMenu(QTreeWidget):
         toc_html.write(self.memory_toc_html.getvalue())
         toc_html.close()
         self.memory_toc_html.truncate()
+        self.create_json_table_of_contents()
+
+    def create_json_table_of_contents(self):
+        toc_html = open(self.contents_html_path, 'r')
+        toc_json = open(self.contents_js_path, 'w+')
+        json_data = json.dumps([toc_html.read()], ensure_ascii=False)
+        toc_json.write('var toc = {};'.format(json_data))
+        toc_json.close()
+        toc_html.close()
 
     def create_table_of_contents(self, contents, root, widgets=True):
         print >> self.memory_toc_html, '<ul>'
@@ -86,24 +104,24 @@ class TocTreeMenu(QTreeWidget):
                 if isinstance(name, list):
                     if widgets:
                         self.parent = QTreeWidgetItem(root)
-
                         self.parent.setFlags(
                             Qt.ItemIsEditable | Qt.ItemIsEnabled |
                             Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
                         )
                         self.parent.setData(0, Qt.UserRole, link[0])
                         self.parent.setText(0, link[1])
-                        self.widget_items[str(link[0])] = self.parent
-                    print >> self.memory_toc_html, '<li><a href="{}">{}</a>'.format(
-                        link[0], link[1]
-                    )
+                        self.widget_items[link[0]] = self.parent
+                    print >> self.memory_toc_html, \
+                        '<li data-jstree={"icon":"images/book.png"}>' \
+                        '<a href="%s">%s</a>' % (link[0], link[1])
+
                     self.create_table_of_contents(name, self.parent, widgets)
                     print >> self.memory_toc_html, '</li>'
 
                 else:
                     if link != name:
                         print >> self.memory_toc_html, \
-                            '<li><a href="{}">{}</a></li>'.format(link, name)
+                            '<li data-jstree={"icon":"images/toc_topic.png"}><a href="%s">%s</a></li>'% (link, name)
                         if widgets:
                             if self.parent is not None:
                                 item = QTreeWidgetItem(self.parent)
@@ -115,7 +133,7 @@ class TocTreeMenu(QTreeWidget):
                             )
                             item.setData(0, Qt.UserRole, link)
                             item.setText(0, name)
-                            self.widget_items[str(link)] = item
+                            self.widget_items[link] = item
         print >> self.memory_toc_html, '</ul>'
 
     def on_item_changed(self):
@@ -125,15 +143,20 @@ class TocTreeMenu(QTreeWidget):
         self.xml_util.change_title(new_title, link)
         contents_data = self.xml_util.xml_point_attributes('toc')
         self.blockSignals(True)
+        print 'saved'
         self.save_table_of_contents(contents_data, False)
         self.blockSignals(False)
-#
-# if __name__ == '__main__':
-#
-#     import sys
-#     app = QApplication(sys.argv)
-#     window = TocTreeMenu()
-#     window.resize(400, 300)
-#     window.show()
-#     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+
+    import sys
+    app = QApplication(sys.argv)
+    full_language_dir = os.path.join(
+        PLUGIN_DIR, DOC, DEFAULT_VERSION, LANGUAGE
+    )
+    window = TocTreeMenu(full_language_dir)
+    window.create_json_table_of_contents()
+    window.resize(400, 300)
+    window.show()
+    sys.exit(app.exec_())
 

@@ -33,3 +33,13 @@ footer {
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a{
     color:#fff;
 }
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: 10px;
+    margin-left: 10px;
+        width: 99%;
+}
+.col-md-3 {
+    overflow: auto;
+}

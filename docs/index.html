@@ -11,19 +11,33 @@
 
     <title>User Manual | Social Tenure Domain Model</title>
 
+
     <!-- Bootstrap Core CSS -->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="assets/css/custom.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/js/jstree_a6a0d0d/themes/default/style.css" />
+    <script src="assets/js/jquery.js " type="text/javascript"></script>
+<!--<script>$.getScript(html_file.doc_path + '/' + 'table_of_contents.js');</script>-->
+
+<!-- jQuery -->
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--&lt;!&ndash;[if lt IE 9]>-->
         <!--<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>-->
         <!--<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>-->
     <!--<![endif]&ndash;&gt;-->
+ <script src="current_file.js"></script>
+<script>
+    var toc_src = html_file.doc_path+'/table_of_contents.js';
+//        script_wrapper.innerHTML = '<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>';
 
+       document.write('<'+'script src="'+toc_src+'" type="text/javascript"><' + '/script'+'>');
+               var doc_src = html_file.current_js;
+         document.write('<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>');
+
+</script>
 </head>
 
 <body>
@@ -47,9 +61,7 @@
                     <li>
                         <a href="#">About</a>
                     </li>
-                    <li>
-                        <a href="#">Services</a>
-                    </li>
+
                     <li>
                         <a href="#">Contact</a>
                     </li>
@@ -68,230 +80,14 @@
             <div class="col-md-3">
                 <p class="lead">Table of Contents</p>
                 <label>Search<input type="text" id="search_toc"></label>
-                <div class="list-group" id="st_side_menu"><ul>
-<li><a href="preface.htm">Preface</a></li>
-<li><a href="introduction.htm">Introduction</a>
-<ul>
-<li><a href="what_is_new.htm">What's New in STDM Version 1.5?</a></li>
-<li><a href="getting_technical_support.htm">Getting Technical Support</a></li>
-<li><a href="system_requirements.htm">System Requirements</a></li>
-</ul>
-</li>
-<li><a href="">Installing STDM</a>
-<ul>
-<li><a href="before_installing.htm">Before Installing</a></li>
-<li><a href="using_bundled_stdm_installer.htm">Using Bundled STDM Installer</a></li>
-<li><a href="installing_from_gltn_plugin_repository.htm">Installing From GLTN Plugin Repository</a></li>
-<li><a href="migration_from_previous_version.htm">Migration from Previous Version</a>
-<ul>
-<li><a href="automatic_upgrade.htm">Automatic Upgrade</a></li>
-<li><a href="manual_upgrade.htm">Manual Upgrade</a></li>
-</ul>
-</li>
-<li><a href="failed_stdm_installation.html">Failed STDM Installation</a>
-<ul>
-<li><a href="failure_to_install_after_uninstall.html">Failure to Install after Uninstalling Previous Versions</a></li>
-<li><a href="failure_to_install_on_windows_7.htm">Failure to Install on Windows 7</a></li>
-<li><a href="failure_to_install_on_windows_server.html">Failure to Install on Windows Server</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="">Getting Started with STDM</a>
-<ul>
-<li><a href="user_interface.htm">User Interface</a></li>
-<li><a href="logging_in_to_stdm.htm">Logging into STDM</a></li>
-<li><a href="logging_out_of_stdm.htm">Logging out of STDM</a></li>
-<li><a href="working_with_sample_data.htm">Working with Sample Data</a></li>
-<li><a href="resetting_postgresql_password.htm">Resetting PostgreSQL Password</a></li>
-</ul>
-</li>
-<li><a href="">Creating and Customizing Data Profiles</a>
-<ul>
-<li><a href="getting_started_with_the_configuration_wizard.htm">Getting Started with the Configuration Wizard</a></li>
-<li><a href="creating_draft_configuration.htm">Creating Draft Configuration</a></li>
-<li><a href="">Configuring Directory Settings</a>
-<ul>
-<li><a href="modifying_supporting_document_path.htm">Modifying Supporting Document Path</a></li>
-<li><a href="modifying_documents_output_path.htm">Modifying Documents Output Path</a></li>
-<li><a href="modifying_template_path.htm">Modifying Template Path</a></li>
-</ul>
-</li>
-<li><a href="">Configuring Profiles</a>
-<ul>
-<li><a href="creating_profiles.htm">Creating Profiles</a></li>
-<li><a href="copying_profile.htm">Copying Profile</a></li>
-<li><a href="customizing_profiles.htm">Customising Profiles</a></li>
-<li><a href="deleting_profiles.htm">Deleting Profiles</a></li>
-</ul>
-</li>
-<li><a href="">Configuring Entities</a>
-<ul>
-<li><a href="creating_entities.htm">Creating Entities</a></li>
-<li><a href="editing_entities.htm">Editing Entities</a></li>
-<li><a href="deleting_entities.htm">Deleting Entities</a></li>
-</ul>
-</li>
-<li><a href="">Configuring Columns</a>
-<ul>
-<li><a href="creating_columns.htm">Creating Columns</a></li>
-<li><a href="understanding_column_data_types.htm">Understanding Column Data Types</a></li>
-<li><a href="editing_columns.htm">Editing Columns</a></li>
-<li><a href="deleting_columns.htm">Deleting Columns</a></li>
-<li><a href="re-ordering_columns.htm">Re-ordering Columns</a></li>
-</ul>
-</li>
-<li><a href="">Configuring Lookups</a>
-<ul>
-<li><a href="creating_lookups.htm">Creating Lookups</a></li>
-<li><a href="editing_lookups.htm">Editing Lookups</a></li>
-<li><a href="deleting_lookups.htm">Deleting Lookups</a></li>
-</ul>
-</li>
-<li><a href="">Configuring Lookup Values</a>
-<ul>
-<li><a href="creating_values.htm">Creating Values</a></li>
-<li><a href="editing_values.htm">Editing Values</a></li>
-<li><a href="deleting_values.htm">Deleting Values</a></li>
-<li><a href="re-ordering_values.htm">Re-ordering Values</a></li>
-</ul>
-</li>
-<li><a href="">Defining Social Tenure Relationship Entities</a>
-<ul>
-<li><a href="str_overview.htm">Overview of the Social Tenure Relationship Definition</a></li>
-<li><a href="selecting_party_and_spatial_unit_entity.htm">Selecting Party and Spatial Unit Entity</a></li>
-<li><a href="setting_one_or_more_parties_per_spatial_unit.htm">Setting One or More Parties per Spatial Unit</a></li>
-</ul>
-</li>
-<li><a href="save_configuration_to_database.htm">Save Configuration To Database</a></li>
-</ul>
-</li>
-<li><a href="managing_tenure_data.htm">Managing Entity Data</a>
-<ul>
-<li><a href="managing_administrative_unit.htm">Managing Administrative Unit</a></li>
-<li><a href="managing_entities.htm">Managing Entities</a>
-<ul>
-<li><a href="adding_a_record.htm">Adding a Record</a></li>
-<li><a href="adding_a_record_using_a_subform.htm">Adding a Record Using a Subform</a></li>
-<li><a href="querying_a_record.htm">Querying a Record</a></li>
-<li><a href="editing_a_record.htm">Editing a Record</a></li>
-<li><a href="editing_a_record_using_a_subform.htm">Editing a Record Using a Subform</a></li>
-<li><a href="deleting_a_record.htm">Deleting a Record</a></li>
-</ul>
-</li>
-<li><a href="managing_spatial_data.htm">Managing Spatial Data</a>
-<ul>
-<li><a href="adding_imagery_data.htm">Adding Imagery data</a></li>
-<li><a href="renaming_spatial_entity_layer.htm">Renaming Spatial Entity Layer</a></li>
-<li><a href="adding_a_spatial_entity_layer.htm">Adding a Spatial Entity Layer</a></li>
-<li><a href="digitizing_in_a_spatial_entity_layer.htm">Digitizing in a Spatial Entity Layer</a></li>
-<li><a href="importing_gps_data.htm">Importing GPS Data</a></li>
-<li><a href="viewing_spatial_geometry.htm">Viewing Extents of Spatial Entity Features</a></li>
-<li><a href="viewing_a_spatial_entity_details.htm">Viewing a Spatial Entity Details</a></li>
-</ul>
-</li>
-<li><a href="managing_social_tenure_relationship.htm">Managing Social Tenure Relationship</a>
-<ul>
-<li><a href="creating_social_tenure_relationship.htm">Creating Social Tenure Relationship</a></li>
-<li><a href="querying__viewing_social_tenure_relationship.htm">Querying/ Viewing Social Tenure Relationship</a></li>
-<li><a href="editing_social_tenure_relationship.htm">Editing Social Tenure Relationship</a></li>
-<li><a href="deleting_a_social_tenure_relationship.htm">Deleting a Social Tenure Relationship</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="">Designing and Generating Documents</a>
-<ul>
-<li><a href="designing_a_document_template.htm">Designing a Document Template</a>
-<ul>
-<li><a href="document_designer.htm">Getting Started with Document Designer</a></li>
-<li><a href="database_views_for_document_templates.htm">Database Views for Document Templates</a></li>
-<li><a href="tools_of_document_designer.htm">Tools of Document Designer</a>
-<ul>
-<li><a href="stdm_document_designer_toolbar.htm">STDM Document Designer Toolbar</a></li>
-<li><a href="stdm_data_source.htm">STDM Data Source</a></li>
-<li><a href="stdm_item_properties.htm">STDM Item Properties</a></li>
-<li><a href="composition.htm">Composition</a></li>
-<li><a href="item_properties.htm">Item Properties</a></li>
-<li><a href="composer_item_toolbar.htm">Composer Item Toolbar</a></li>
-</ul>
-</li>
-<li><a href="customizing_a_template_page.htm">Customizing a Template Page</a></li>
-<li><a href="adding_items_into_a_template.htm">Adding Items into a Template</a>
-<ul>
-<li><a href="static_items.htm">Static Items</a>
-<ul>
-<li><a href="adding_a_line.htm">Adding a Line</a></li>
-<li><a href="add_image.htm">Adding an Image</a></li>
-<li><a href="adding_a_label.htm">Adding a Label</a></li>
-</ul>
-</li>
-<li><a href="data_driven_items.htm">Data Driven Items</a>
-<ul>
-<li><a href="adding_a_data_label.htm">Adding a Data Label</a></li>
-<li><a href="adding_map.htm">Adding a Map</a></li>
-<li><a href="adding_a_legend.htm">Adding a Legend</a></li>
-<li><a href="adding_photo.htm">Adding a Photo</a></li>
-<li><a href="adding_attribute_table.htm">Adding an Attribute Table</a></li>
-<li><a href="adding_a_chart.htm">Adding a Chart</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="managing_a_template.htm">Managing a Template</a></li>
-<li><a href="tips_and_workarounds.htm">Tips and Workarounds</a></li>
-<li><a href="learn_more_about_qgis_print_composer.htm">Learn More about QGIS Print Composer</a></li>
-</ul>
-</li>
-<li><a href="generating_documents_using_templates.htm">Generating Documents Using Templates</a></li>
-</ul>
-</li>
-<li><a href="">Managing Data Import and Export</a>
-<ul>
-<li><a href="formatting_spread_sheet_data.htm">Formatting Spreadsheet Data</a></li>
-<li><a href="importing_attribute_data.htm">Importing Attribute Data</a></li>
-<li><a href="importing_spatial_data.htm">Importing Spatial Data</a></li>
-<li><a href="importing_supporting_documents.htm">Importing Supporting Documents</a></li>
-<li><a href="importing_data_to_related_table_columns.htm">Importing Data to Related Table Columns</a></li>
-<li><a href="importing_into_lookup_columns.htm">Importing into Lookup Columns</a></li>
-<li><a href="export_data_from_stdm.htm">Export Data from STDM</a></li>
-</ul>
-</li>
-<li><a href="">Settings</a>
-<ul>
-<li><a href="">Managing User and Roles</a>
-<ul>
-<li><a href="user_management.htm">User Management</a></li>
-<li><a href="role_management.htm">Role Management</a></li>
-<li><a href="user_mappings.htm">User Mappings</a></li>
-<li><a href="content_authorization.htm">Content Authorization</a></li>
-</ul>
-</li>
-<li><a href="options.htm">Options</a>
-<ul>
-<li><a href="changing_the_current_profile.htm">Changing the Current Profile</a></li>
-<li><a href="modifying_database_connection_settings.htm">Modifying Database Connection Settings</a></li>
-<li><a href="modifying_stdm_folders.htm">Modifying STDM Folders</a></li>
-<li><a href="upgrading_old_configuration.htm">Upgrading Old Configuration</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="">Annex A: Working with Spatial Data in QGIS</a>
-<ul>
-<li><a href="working_with_gps.htm">Working with GPS</a></li>
-<li><a href="before_using_gps.htm">Before using GPS</a></li>
-<li><a href="downloading_gps_data_from_qgis.htm">Downloading GPS data from QGIS</a></li>
-<li><a href="georeferencing.htm">Geo-referencing a Map Image</a></li>
-</ul>
-</li>
-</ul>
+                <div class="list-group" id="st_side_menu">
+
 
 
                 </div>
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9" id="doc_container">
 
 
             </div>
@@ -315,34 +111,92 @@
         </footer>
 
     </div>
-    <!-- /.container -->
+    <script src="assets/js/bootstrap.min.js" ></script>
+    <script src="assets/js/jstree_a6a0d0d/jstree.js" ></script>
 
-    <!-- jQuery -->
-    <script src="assets/js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/jstree_a6a0d0d/jstree.js"></script>
 <script>
+
+
     $(document).ready(function() {
+        $('#st_side_menu').html(toc[0]);
+        $('#doc_container').html(doc[0]);
+    $('#st_side_menu').jstree({
 
-        $('#st_side_menu').jstree({
+        "plugins": [
+            "checkbox",
+            "contextmenu",
+            "dnd",
+            "massload",
+            "search",
+            "sort",
+            "state",
+            "types",
+            "unique",
+            "wholerow",
+            "changed",
+            "conditionalselect"
+        ],
+        "types": {
+            "default": {
+                "icon": "images/book.png"
+            },
+            "moveType": {
+                "icon": "glyphicon glyphicon-transfer"
+            }
+        }
+    }).bind("select_node.jstree", function (NODE, REF_NODE) {
 
-            "plugins" : [
-	"checkbox",
-	"contextmenu",
-	"dnd",
-	"massload",
-	"search",
-	"sort",
-	"state",
-	"types",
-	"unique",
-	"wholerow",
-	"changed",
-	"conditionalselect"
-]
-        });
+//            var a = $.jstree._focused().get_selected();
+                var clicked_file = REF_NODE.node.a_attr.href;
+                var prev_doc_src = doc_src;
+                var prev_doc = doc;
+                doc_src = html_file.doc_path + '/'+ clicked_file.split('.')[0] + '.js';
+//               console.log(document.getElementsByTagName('script'));
+              var scripts = document.getElementsByTagName('script');
+               for (var i = 0; i < scripts.length; i++){
+//                   console.log(scripts[i].src, doc_src);
+                   if (scripts[i].src.indexOf(prev_doc_src) > 0){
+
+                            scripts[i].remove();
+                                    var my_awesome_script = document.createElement('script');
+
+                                    my_awesome_script.setAttribute('src',doc_src);
+                                    //
+                                    document.head.appendChild(my_awesome_script);
+                                    $('#doc_container').html(doc[0]);
+                                    break;
+                        }
+               }
+//                            var doc_src = html_file.current_js;
+
+//         document.write('<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>');
+//
+////
+
+//                 script_wrapper.innerHTML = '<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>';
+//                var imported = document.createElement('script');
+//            imported.src = doc_src;
+////            var new_doc;
+//            new_doc = doc;
+//            document.head.appendChild(imported);
+//                document.write('<'+'script src="'+doc_src+
+//                    '" type="text/javascript"><' + '/script'+'>');
+//        console.log(doc[0]);
+//                var wrapper= document.createElement('div');
+//                wrapper.innerHTML= doc[0];
+//                var doc_body = wrapper.getElementsByTagName('body');
+//                var content = doc_body.innerHTML;
+//                var doc_cont = document.getElementById('doc_container');
+//                doc_cont.innerHTML = doc[0];
+//                return false;
+//                console.log(doc[0]);
+
+
+//                $('#doc_container').html(doc[0]);
+        })
+
+    });
+
         var to = false;
   $('#search_toc').keyup(function () {
     if(to) { clearTimeout(to); }
@@ -350,8 +204,23 @@
       var v = $('#search_toc').val();
       $('#st_side_menu').jstree(true).search(v);
     }, 250);
-  });
-    });
+
+
+
+//
+//
+//$("#st_side_menu").bind('select_node.jstree', function(e) {
+//    // gather ids of selected nodes
+//    var selected_ids = [];
+//    $("#st_side_menu").jstree('get_selected').each(function () {
+//        selected_ids.push(this.id);
+//    });
+//    // do summit with them
+//    $('#st_side_menu').text('selected '+selected_ids);
+//
+//    console.log(selected_ids);
+//});
+});
 </script>
 </body>
 
