@@ -1,0 +1,1 @@
+var added_languages = {"en":"English","pt":"Portuguese"};

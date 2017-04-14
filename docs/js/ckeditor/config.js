@@ -31,7 +31,7 @@ CKEDITOR.editorConfig = function(config) {
 	];
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;h4;h5';
-	config.extraPlugins = 'image2,simple-image-browser,zoom,pastefromword,ajax';
+	config.extraPlugins = 'image2,simple-image-browser,zoom,pastefromword,codemirror';
 	config.forcePasteAsPlainText = false;
     config.pasteFromWordRemoveFontStyles = true;
     config.pasteFromWordRemoveStyles = false;
@@ -39,5 +39,5 @@ CKEDITOR.editorConfig = function(config) {
     config.extraAllowedContent = 'p(mso*,Normal)';
     config.pasteFilter = 'h1 h2 h3 h4 h5 h6 h7 p ul ol li; img[!src, alt]; a[!href]';
 	config.removeButtons = 'About,Smiley,Flash,Preview,Print,Styles,Maximize,';
-	config.font_names = 'Cambria;Arial/Arial, Helvetica;';//Times New Roman/Times New Roman, Times, serif;Verdana';
+	config.font_names = 'Cambria;';//Times New Roman/Times New Roman, Times, serif;Verdana';
 };

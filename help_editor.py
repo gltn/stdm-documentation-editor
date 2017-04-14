@@ -1,9 +1,12 @@
+import glob
 import json
 import os
 import re
 import sys
 from HTMLParser import HTMLParser
+from collections import OrderedDict
 
+import simplejson as simplejson
 from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
@@ -12,6 +15,7 @@ from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QMainWindow
+from PyQt4.QtGui import QProgressDialog
 from PyQt4.QtWebKit import QWebSettings, QWebPage
 
 from utils import get_images, get_gallery_images
@@ -34,12 +38,14 @@ from settings import (
     IMG_PARAM,
     LANGUAGE_DOC,
     LANG_SETTING_FILE,
+    TABLE_OF_CONTENT_JS,
     HOME,
     STDM_VERSIONS,
     CURRENT_FILE,
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
-    TABLE_OF_CONTENT_HTML, LANGUAGE_DOC_HTML)
+    LIST_OF_JS_DOCS,
+    LANGUAGES_WITH_CONTENT)
 
 
 class WebPage(QWebPage):
@@ -60,6 +66,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self._curr_file_path = None
         self._curr_file_path_js = None
         self._curr_title = None
+        self.current_item = None
         get_images(LANGUAGE_DOC)
         get_gallery_images(LANGUAGE_DOC)
         self.help_path = os.path.join(PLUGIN_DIR, HELP_EDITOR_HTML)
@@ -81,13 +88,15 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self._prev_file_path = None
         self.current_document = None
         self._current_file = None
+        self.added_languages = OrderedDict()
         self.init_gui()
 
         self.on_show_gallery()
         self.content_editor.dropEvent = self.on_help_editor_item_drop
         # Start with the first page if current_file.js doesn't exist
-        print self._current_file
+
         if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
+            self.switch_table_of_content('preface.htm')
             self.current_item = self.toc.widget_items['preface.htm']
             title = str(self.current_item.text(0))
             self.set_current_file('preface.htm', title)
@@ -97,7 +106,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.toc.expandItem(self.current_item.parent())
             self.toc.setCurrentItem(self.current_item)
             self.setWindowTitle(
-                'STDM Documentation Editor -{}'.format(self._curr_title)
+                'STDM Documentation Editor - {}'.format(self._curr_title)
             )
 
     def read_current_file(self):
@@ -154,6 +163,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.image_browse_btn.clicked.connect(self.file_dialog)
         self.window_loaded.connect(self.on_widow_loaded)
         self.action_preview.triggered.connect(self.on_preview_in_browser)
+        self.action_generate_web_help.triggered.connect(self.create_js_doc)
         self.populate_languages()
         self.populate_stdm_version()
 
@@ -202,10 +212,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         prev_toc_link = str(self.current_item.data(
             0, Qt.UserRole).toString()
         )
+
         self.current_lang_code = str(
             self.language_cbo.itemData(index).toString()
         )
         self.current_lang_name = str(self.language_cbo.currentText())
+        if self.current_lang_code not in self.added_languages.keys():
+            self.added_languages[self.current_lang_code] = \
+                self.current_lang_name
         self.full_language_dir = os.path.join(
             PLUGIN_DIR, DOC, self.current_version, self.current_lang_code
         )
@@ -214,10 +228,15 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         )
         self.copy_language()
         self.switch_table_of_content(prev_toc_link)
+        self.create_added_languages_js()
 
     def switch_table_of_content(self, prev_toc_link):
         if self.toc is not None:
-            self.toc.update_contents_path(self.full_language_dir)
+            updated_info = [self.current_version, self.current_lang_code]
+            self.toc.update_contents_path(
+                self.full_language_dir, updated_info
+            )
+
             current_widget_item = self.toc.widget_items[prev_toc_link]
             self.toc.setCurrentItem(current_widget_item)
             current_title = str(current_widget_item.text(0))
@@ -244,28 +263,86 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             data = str(url.fragment())
             # handle saving.
             if not data.startswith(IMG_PARAM):
-                data = re.sub(r"\"/+", '', data)
-
-                full_html = '<html><head><title>{}</title></head>' \
-                    '<body>{}</body></html>'.format(
-                            self._curr_title, data
-                )
-                formatted_html = format_html(full_html)
-
-                html_file = open(
-                    '{}/{}'.format(DOC, self._curr_file_path), 'w+')
-                html_file.write(formatted_html)
-                html_file.close()
-                json_data = json.dumps([formatted_html], ensure_ascii=False)
-                js_file = open(
-                    '{}/{}'.format(DOC, self._curr_file_path_js), 'w+')
-                js_file.write('var doc = {};'.format(json_data))
-                js_file.close()
+                self.save_html_js_doc(data)
             # upload image
             else:
-                url_data = data.split('{}='.format(IMG_PARAM))
+                url_data = data.split('{} = '.format(IMG_PARAM))
                 if len(url_data) > 0:
-                    self.save_local_files([url_data[1]])
+                    self.save_local_images([url_data[1]])
+
+    def save_html_js_doc(self, data):
+        data = re.sub(r"\"/+", '', data)
+        full_html = '<html><head><title>{}</title></head>' \
+                    '<body>{}</body></html>'.format(
+            self._curr_title, data
+        )
+        formatted_html = format_html(full_html)
+        html_file = open(
+            '{}/{}'.format(DOC, self._curr_file_path), 'w')
+        html_file.write(formatted_html)
+        html_file.close()
+        json_data = json.dumps([formatted_html], ensure_ascii=False)
+        path = '{}/{}'.format(DOC, self._curr_file_path_js)
+        file_name = os.path.basename(self._curr_file_path_js).split('.')[0]
+        self.write_js_doc(file_name, json_data, path)
+
+    def create_js_doc(self):
+        progress = QProgressDialog(self)
+        title = QApplication.translate('HelpEditor', 'Generating...')
+        progress.setWindowTitle(title)
+        progress.setMinimumHeight(70)
+        progress.setValue(0)
+        progress.open()
+
+
+        for lang_code in self.added_languages.keys():
+            doc_path = os.path.join(
+                PLUGIN_DIR, DOC, self.current_version, lang_code
+            )
+            js_files = []
+            for dir_path, sub_dirs, files in os.walk(doc_path):
+
+                html_files = glob.glob('{}/*{}'.format(dir_path, '.html'))
+                html_files.extend(glob.glob('{}/*{}'.format(dir_path, '.htm')))
+                progress.setRange(0, len(html_files) - 1)
+                for i, html_file_path in enumerate(html_files):
+                    if os.path.basename(html_file_path) == '.':
+                        print html_file_path
+                        continue
+                    html_file = open(html_file_path, 'r')
+                    data = html_file.read()
+                    json_data = json.dumps([data], ensure_ascii=False)
+                    html_file.close()
+
+                    file_name = os.path.basename(html_file_path).split('.')[0]
+                    path = '{}/{}.js'.format(doc_path, file_name)
+
+                    relative_path = '{}/{}/{}.js'.format(
+                        self.current_version, lang_code, file_name)
+                    js_files.append(relative_path)
+                    self.write_js_doc(file_name, json_data, path)
+                    progress.setValue(i)
+                    toc_full_path = '{}/{}'.format(doc_path, TABLE_OF_CONTENT_JS)
+                    if i == 0:
+                        if os.path.isfile(toc_full_path):
+                            toc_rel_path = '{}/{}/{}'.format(
+                                self.current_version,
+                                lang_code,
+                                TABLE_OF_CONTENT_JS
+                            )
+                            js_files.append(toc_rel_path)
+            js_doc_cont = open('{}/{}'.format(
+                doc_path, LIST_OF_JS_DOCS
+            ), 'w')
+            js_doc_cont.write('var js_doc_files = {};'.format(js_files))
+            js_doc_cont.close()
+        progress.hide()
+
+    def write_js_doc(self, file_name, json_data, path):
+        js_file = open(path, 'w')
+        variable_name = file_name.replace('-', '_')
+        js_file.write('var {} = {};'.format(variable_name, json_data))
+        js_file.close()
 
     def get_item_url(self, item, col=0):
         self._prev_file_path = self._curr_file_path
@@ -292,11 +369,13 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         file_name = os.path.basename(self._curr_file_path).split('.')[0]
         self._curr_file_path_js = '{}/{}.js'.format(self.language_doc,
                                                     file_name)
-        output_file = open(CURRENT_FILE, 'w+')
+        output_file = open(CURRENT_FILE, 'w')
 
         self._current_file = {
             "current": str(self._curr_file_path),
-            'current_js': self._curr_file_path_js,
+            'current_js_path': self._curr_file_path_js,
+            'language': self.current_lang_code,
+            'current_name': file_name.replace('-', '_'),
             'doc_path': self.language_doc, 'title': title,
             'full_img_path': '{}/{}'.format(self.full_language_dir, IMAGES),
             'relative_img_path': '{}/{}'.format(self.language_doc, IMAGES),
@@ -353,14 +432,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             HOME,
             "Images ({})".format(' '.join(IMAGE_TYPES.values()))
         )
-        self.save_local_files(files)
+        self.save_local_images(files)
 
-    def save_local_files(self, files):
-
+    def save_local_images(self, files):
         path = os.path.join(PLUGIN_DIR, DOC, self.language_doc, IMAGES)
         destination_files = []
         for file_path in files:
-
             destination_file = copy_file(file_path, path)
             destination_files.append(destination_file)
         get_images(self.language_doc)
@@ -369,39 +446,44 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.load_image(destination_file)
 
     def populate_languages(self):
+
         for code, language in LANGUAGES.iteritems():
             doc_dir = os.path.join(PLUGIN_DIR, DOC, self.current_version, code)
             if os.path.isdir(doc_dir):
                 self.language_cbo.addItem(language, code)
+                self.added_languages[str(code)] =str(language)
+
+        self.create_added_languages_js()
+
+    def create_added_languages_js(self):
+        path = '{}/{}/{}'.format(PLUGIN_DIR, DOC, LANGUAGES_WITH_CONTENT)
+        js_file = open(path, 'w')
+        encoder = OrderedJsonEncoder()
+        ordered_json = encoder.encode(self.added_languages)
+        js_file.write('var added_languages = {};'.format(ordered_json))
+        js_file.close()
 
     def on_add_language(self):
         add_language = AddLanguage(self.current_version, self)
-        result = add_language.exec_()
-        if result:
-            lang_name = str(add_language.name.text()).strip()
-            lang_code = str(add_language.code.text()).lower().strip()
-
-            new_lag_entry = '"{}": "{}"'.format(lang_code, lang_name)
-            lang_file = open(LANG_SETTING_FILE, 'r')
-            lang_list = lang_file.read()
-
-            index = lang_list.find('}')
-            updated_lang_list = '{}, {}{}'.format(
-                lang_list[:index], new_lag_entry, lang_list[index:]
-            )
-            lang_file.close()
-            lang_file = open(LANG_SETTING_FILE, 'w+')
-            lang_file.write(updated_lang_list)
-            lang_file.close()
-            self.language_cbo.addItem(lang_name, lang_code)
+        add_language.exec_()
 
     def on_preview_in_browser(self):
         service = QDesktopServices()
+        self.create_js_doc()
+        url = QUrl.fromLocalFile(PREVIEW_URL)
+        url.setQueryItems([('mode', 'preview')])
+        url.setFragment('preview')
 
-        url = QUrl()
-        url.setUrl(PREVIEW_URL)
         service.openUrl(url)
 
+class OrderedJsonEncoder( simplejson.JSONEncoder ):
+   def encode(self,o):
+      if isinstance(o, OrderedDict):
+         return "{" + ",".join(
+             [self.encode(k)+":"+self.encode(v) for (k,v) in o.iteritems() ]
+         ) + "}"
+      else:
+         return simplejson.JSONEncoder.encode(self, o)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = HelpEditor()

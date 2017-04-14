@@ -25,13 +25,16 @@ IMAGE_BROWSER_HTML = '{}/image_browser.html'.format(DOC)
 GALLERY_LIST_JS = '{}/gallery_list.js'.format(DOC)
 IMAGE_JS = '{}/images.js'.format(DOC)
 DEFAULT_VERSION = '1_5'
+HTML_EXTENSION = '.htm'
 LANGUAGE_DOC = '{}/{}'.format(DEFAULT_VERSION, LANGUAGE)
 PREVIEW_URL = '{}/{}/index.html'.format(PLUGIN_DIR, DOC)
 LANGUAGE_DOC_HTML = '{}/{}/{}'.format(PLUGIN_DIR, DOC, LANGUAGE_DOC)
 STDM_VERSIONS = OrderedDict([('1_5', 'STDM 1.5')
                              ])
+LIST_OF_JS_DOCS = 'docs_js_list.js'
 TABLE_OF_CONTENT_HTML = 'table_of_contents.html'
 TABLE_OF_CONTENT_JS = 'table_of_contents.js'
 
 TABLE_OF_CONTENT_XML = 'table_of_contents.xml'
 HOME = expanduser("~")
+LANGUAGES_WITH_CONTENT = 'languages_with_content.js'

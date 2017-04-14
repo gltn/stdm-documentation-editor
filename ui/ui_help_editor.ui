@@ -169,6 +169,7 @@
     <addaction name="action_download"/>
     <addaction name="separator"/>
     <addaction name="action_preview"/>
+    <addaction name="action_generate_web_help"/>
    </widget>
    <widget class="QMenu" name="menuRegister">
     <property name="title">
@@ -203,6 +204,11 @@
   <action name="action_preview">
    <property name="text">
     <string>Preview in Browser</string>
+   </property>
+  </action>
+  <action name="action_generate_web_help">
+   <property name="text">
+    <string>Generate Web Help</string>
    </property>
   </action>
  </widget>
