@@ -20,11 +20,18 @@ class GitWrapper(object):
                 print "Not a valid git repo!"
                 return
 
+        self.git = git.cmd.Git(self.repo)
+
     def git_add(self):
-        pass
+        mfiles = self.get_modified_files()
+        for mfile in mfiles:
+            self.git.add(mfile)
+
     def git_commit(self):
         pass
     def git_clone(self):
+        pass
+    def git_push(self):
         pass
     def get_modified_files(self):
         mfiles = []
