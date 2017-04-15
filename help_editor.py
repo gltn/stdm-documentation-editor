@@ -2,7 +2,9 @@ import glob
 import json
 import os
 import re
+import shutil
 import sys
+import zipfile
 from HTMLParser import HTMLParser
 from collections import OrderedDict
 
@@ -15,6 +17,7 @@ from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QMainWindow
+from PyQt4.QtGui import QMessageBox
 from PyQt4.QtGui import QProgressDialog
 from PyQt4.QtWebKit import QWebSettings, QWebPage
 
@@ -149,7 +152,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.image_browse_btn.clicked.connect(self.file_dialog)
         self.window_loaded.connect(self.on_widow_loaded)
         self.action_preview.triggered.connect(self.on_preview_in_browser)
-        self.action_generate_web_help.triggered.connect(self.create_js_doc)
+        self.action_export_zip.triggered.connect(self.export_doc_to_zip)
         self.populate_languages()
         self.populate_stdm_version()
 
@@ -240,7 +243,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         prev_doc_dir = os.path.join(
             PLUGIN_DIR, DOC, self.prev_version, self.current_lang_code
         )
-
         if not os.path.isdir(self.full_language_dir):
             copy_directory(prev_doc_dir, self.full_language_dir)
 
@@ -276,14 +278,38 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         pattern = re.compile(r'<'+tag+'.*?>(.+?)</'+tag+'>')
         return re.findall(pattern, content)
 
-    def create_js_doc(self):
-        progress = QProgressDialog(self)
-        title = QApplication.translate('HelpEditor', 'Generating...')
-        progress.setWindowTitle(title)
-        progress.setMinimumHeight(70)
-        progress.setValue(0)
+    def export_doc_to_zip(self):
+        path = self.folder_dialog()
+        progress = self.create_js_doc()
         progress.open()
+        zip_file = zipfile.ZipFile('{}/stdm_docs.zip'.format(path), 'w')
+        for dir_name, sub_dirs, files in os.walk(DOC):
+            progress.setRange(0, len(files) - 1)
+            if dir_name.startswith(os.path.join(DOC, 'js')):
+                continue
+            else:
+                zip_file.write(dir_name)
 
+            for i, filename in enumerate(files):
+                progress.setValue(i)
+                if dir_name == DOC:
+                    if filename == 'index.html' or \
+                                    filename == 'current_file.js':
+                        zip_file.write(os.path.join(dir_name, filename))
+
+        zip_file.close()
+        progress.close()
+        title = QApplication.translate('HelpEditor', 'Add Language')
+        message = QApplication.translate(
+            'HelpEditor',
+            'You have successfully exported the documentation.\n'
+            'To access the contents, extract the zip and \n'
+            'open the index.html file located in the docs folder. '
+        )
+        QMessageBox.information(self, title, message)
+
+    def create_js_doc(self):
+        progress = self.init_progress_dialog()
         for lang_code in self.added_languages.keys():
             doc_path = os.path.join(
                 PLUGIN_DIR, DOC, self.current_version, lang_code
@@ -301,47 +327,71 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 for i, html_file_path in enumerate(html_files):
                     if TABLE_OF_CONTENT_HTML in html_file_path:
                         continue
-                    searchable_data = {}
                     if os.path.basename(html_file_path) == '.':
                         continue
-                    html_file = open(html_file_path, 'r')
-                    data = html_file.read()
-                    title = self.get_html_content(data, 'title')
-                    if len(title) > 0:
-                        searchable_data['title'] = title[0]
-                        searchable_data['tags'] = title[0]
-                    else:
-                        searchable_data['title'] = ''
-                        searchable_data['tags'] = ''
-                    searchable_data['text'] = re.sub(r'title\S+\"', '', data)
-
-                    json_data = json.dumps([data], ensure_ascii=False)
-                    html_file.close()
-
+                    data, json_data = self.html_to_json(html_file_path)
                     file_name = os.path.basename(html_file_path).split('.')[0]
                     path = '{}/{}.js'.format(doc_path, file_name)
 
                     relative_path = '{}/{}/{}.js'.format(
                         self.current_version, lang_code, file_name)
-                    searchable_data['url'] = '#{}'.format(file_name)
-
-                    search_cont.append(searchable_data)
                     js_files.append(relative_path)
                     self.write_js_doc(file_name, json_data, path)
+                    search_cont = self.prepare_search(
+                        data, file_name, search_cont
+                    )
                     progress.setValue(i)
-            js_doc_cont = open('{}/{}'.format(
-                doc_path, LIST_OF_JS_DOCS
-            ), 'w')
-            js_doc_cont.write('var js_doc_files = {};'.format(js_files))
-            js_doc_cont.close()
 
-            js_search_cont = open('{}/{}'.format(
-                doc_path, SEARCH_DATA_JS
-            ), 'w')
-            js_search_cont.write('var tipuesearch = {"pages": %s };'
-                                 % search_cont)
-            js_search_cont.close()
+            self.create_file_js_list(doc_path, js_files)
+            self.create_search_js(doc_path, search_cont)
         progress.hide()
+        return progress
+
+    def init_progress_dialog(self):
+        progress = QProgressDialog(self)
+        title = QApplication.translate('HelpEditor', 'Generating...')
+        progress.setWindowTitle(title)
+        progress.setMinimumHeight(70)
+        progress.setValue(0)
+        progress.open()
+        return progress
+
+    def create_search_js(self, doc_path, search_cont):
+        js_search_cont = open('{}/{}'.format(
+            doc_path, SEARCH_DATA_JS
+        ), 'w')
+        js_search_cont.write('var tipuesearch = {"pages": %s };'
+                             % search_cont)
+        js_search_cont.close()
+
+    def create_file_js_list(self, doc_path, js_files):
+        js_doc_cont = open('{}/{}'.format(
+            doc_path, LIST_OF_JS_DOCS
+        ), 'w')
+        js_doc_cont.write('var js_doc_files = {};'.format(js_files))
+        js_doc_cont.close()
+
+    def html_to_json(self, html_file_path):
+        html_file = open(html_file_path, 'r')
+        data = html_file.read()
+        json_data = json.dumps([data], ensure_ascii=False)
+        html_file.close()
+        return data, json_data
+
+    def prepare_search(self, data, file_name, search_cont):
+        searchable_data = {}
+        title = self.get_html_content(data, 'title')
+        if len(title) > 0:
+            searchable_data['title'] = title[0]
+            searchable_data['tags'] = title[0]
+        else:
+            searchable_data['title'] = ''
+            searchable_data['tags'] = ''
+        searchable_data['text'] = re.sub(r'title\S+\"', '', data)
+        searchable_data['url'] = '#{}'.format(file_name)
+
+        search_cont.append(searchable_data)
+        return search_cont
 
     def write_js_doc(self, file_name, json_data, path):
         js_file = open(path, 'w')
@@ -437,9 +487,30 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             HOME,
             "Images ({})".format(' '.join(IMAGE_TYPES.values()))
         )
-        self.save_local_images(files)
+        return files
 
-    def save_local_images(self, files):
+
+    def folder_dialog(self):
+        """
+        Displays a file dialog to choose the destination folder of the zip.
+        :param line_edit: The line edit in which the folder is going to be set.
+        :type line_edit: QLineEdit
+        """
+        title = QApplication.translate(
+            "HelpEditor",
+            "Select a Folder to Save the Zip"
+        )
+        last_path = HOME
+        path = QFileDialog.getExistingDirectory(
+            self,
+            title,
+            last_path,
+            QFileDialog.ShowDirsOnly
+        )
+        return str(path)
+
+    def save_local_images(self):
+        files = self.file_dialog()
         path = os.path.join(PLUGIN_DIR, DOC, self.language_doc, IMAGES)
         destination_files = []
         for file_path in files:
@@ -451,13 +522,11 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.load_image(destination_file)
 
     def populate_languages(self):
-
         for code, language in LANGUAGES.iteritems():
             doc_dir = os.path.join(PLUGIN_DIR, DOC, self.current_version, code)
             if os.path.isdir(doc_dir):
                 self.language_cbo.addItem(language, code)
                 self.added_languages[str(code)] =str(language)
-
         self.create_added_languages_js()
 
     def create_added_languages_js(self):
@@ -483,13 +552,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         service.openUrl(url)
 
 class OrderedJsonEncoder( simplejson.JSONEncoder ):
-   def encode(self,o):
-      if isinstance(o, OrderedDict):
+   def encode(self, data):
+      if isinstance(data, OrderedDict):
          return "{" + ",".join(
-             [self.encode(k)+":"+self.encode(v) for (k,v) in o.iteritems() ]
+             [self.encode(k)+":"+self.encode(v) for (k,v) in data.iteritems()]
          ) + "}"
       else:
-         return simplejson.JSONEncoder.encode(self, o)
+         return simplejson.JSONEncoder.encode(self, data)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = HelpEditor()
