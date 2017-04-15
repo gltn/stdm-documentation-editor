@@ -11,52 +11,82 @@
     <title>User Manual | Social Tenure Domain Model</title>
     <!--<meta http-equiv="referer" content="0;URL='index.html#preview'" />-->
 
+    <script src="assets/js/jquery.js " type="text/javascript"></script>
+
+
+    <script type="text/javascript"
+            src="assets/js/tipue_search_6_0/tipuesearch_set.js"></script>
+    <!--<script type="text/javascript"-->
+    <!--src="assets/js/tipue_search_6_0/tipuesearch_content.js"></script>-->
+    <link rel="stylesheet" type="text/css"
+          href="assets/js/tipue_search_6_0/css/tipuesearch.css">
+    <script type="text/javascript"
+            src="assets/js/tipue_search_6_0/tipuesearch.min.js"></script>
+
 
     <!-- Bootstrap Core CSS -->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="assets/js/tipue_search_6_0/css/tipuesearch.css">-->
     <!-- Custom CSS -->
     <link href="assets/css/custom.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/js/jstree_a6a0d0d/themes/default/style.css"/>
-    <script src="assets/js/jquery.js " type="text/javascript"></script>
+    <link rel="stylesheet"
+          href="assets/js/jstree_a6a0d0d/themes/default/style.css"/>
+
     <script src="current_file.js"></script>
     <script src="languages_with_content.js"></script>
     <script>
-        console.log(window.location);
-        var file_store_outdated, curr_data, local_store;
-        if (window.location.hash == ''){
-            curr_data = {'current_js_path': html_file.current_js_path,
+        var toc_src, doc_list_src, language, current_name, doc_src,
+            current_js_path, local_store, doc_path, curr_data;
+        //        localStorage.clear();
+        if (localStorage["curr_data"] === undefined) {
+            console.log(localStorage.length);
+            curr_data = {
+                'current_js_path': html_file.current_js_path,
                 'current_name': html_file.current_name,
-                'doc_path': html_file.doc_path, 'language': html_file.language
+                'doc_path': html_file.doc_path,
+                'language': html_file.language,
+                'search_data': html_file.search_data
             };
-                    // Put the object into storage
+            // Put the object into storage
             retrieved_object = localStorage.getItem(
                 'curr_data', JSON.stringify(curr_data)
             );
             // Retrieve the object from storage
             local_store = JSON.parse(retrieved_object);
-
+            toc_src = html_file.doc_path + '/table_of_contents.js';
+            doc_list_src = html_file.doc_path + '/docs_js_list.js';
+            language = html_file.language;
+            current_name = html_file.current_name;
+            doc_src = html_file.current_js_path;
+            current_js_path = html_file.current_js_path;
+            doc_path = html_file.doc_path;
+            search_data = html_file.search_data;
+            console.log(doc_path, toc_src);
         }
-        else{
+        else {
             local_store = JSON.parse(localStorage["curr_data"]);
-//            curr_data = {'current_js_path': localStorage.current_js_path,
-//            'current_name': html_file.current_name,
-//            'doc_path': html_file.doc_path, 'language': html_file.language
-//            };
-//            local_store = JSON.parse(retrieved_object);
+            toc_src = local_store.doc_path + '/table_of_contents.js';
+            console.log(toc_src);
+            doc_list_src = local_store.doc_path + '/docs_js_list.js';
+            language = local_store.language;
+            current_name = local_store.current_name;
+            current_js_path = local_store.current_js_path;
+            doc_path = local_store.doc_path;
+            search_data = local_store.search_data;
+            console.log(doc_path);
         }
-
-
-        var toc_src = local_store.doc_path + '/table_of_contents.js';
-        var doc_list_src = local_store.doc_path + '/docs_js_list.js';
-
+        console.log(doc_path);
         document.write('<' + 'script src="' +
             doc_list_src + '" type="text/javascript"><' + '/script' + '>');
         document.write('<' + 'script src="' + toc_src +
             '" type="text/javascript"><' + '/script' + '>');
-        var doc_src = local_store.current_js_path;
+        console.log(current_js_path);
 
-        document.write('<' + 'script src="' + doc_src +
+        document.write('<' + 'script src="' + current_js_path +
             '" type="text/javascript"><' + '/script' + '>');
+        document.write('<' + 'script src="' + doc_path + '/' + 'search_data.js' +
+            '" type="text/javascript"><' + '/script' + '>');
+
 
     </script>
     <style>
@@ -66,7 +96,7 @@
 
 <body>
 
-    <!----<p>Click <a href="index.html#preview">here</a>.</p>-->
+<!----<p>Click <a href="index.html#preview">here</a>.</p>-->
 
 <!-- Navigation -->
 
@@ -81,28 +111,31 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="http://stdm.gltn.net"><img src="images/logo.png"></a>
+            <a class="navbar-brand" href="index.html"><img
+                    src="images/logo.png"></a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse"
              id="bs-example-navbar-collapse-1">
             STDM 1.5 User Manual
             <!--<ul class="nav navbar-nav">-->
-                <!--<li>-->
-                    <!--<a href="#">Installing STDM</a>-->
-                <!--</li>-->
+            <!--<li>-->
+            <!--<a href="#">Installing STDM</a>-->
+            <!--</li>-->
 
-                <!--<li>-->
-                    <!--<a href="#">About</a>-->
-                <!--</li>-->
+            <!--<li>-->
+            <!--<a href="#">About</a>-->
+            <!--</li>-->
             <!--</ul>-->
             <div class="nav navbar-nav navbar-right">
 
-                <select class="form-control" id="stdm_version" data-width="fit">
+                <select class="form-control" id="stdm_version"
+                        data-width="fit">
                     <option value="1_5">STDM 1.5</option>
                 </select>
 
-                <select class="form-control" id="added_languages" data-width="fit">
+                <select class="form-control" id="added_languages"
+                        data-width="fit">
 
                 </select>
             </div>
@@ -119,41 +152,76 @@
 
     <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-3" id="left">
+            <!--<form action="index.html">-->
+                <!--<div class="tipue_search_left">-->
+                    <!--<img src="images/search.png" class="tipue_search_icon">-->
+                <!--</div>-->
+                <!--<div class="tipue_search_right">-->
+                    <!--<input type="text" name="q" id="tipue_search_input"-->
+                           <!--pattern=".{3,}" title="At least 3 characters"-->
+                           <!--required>-->
+                <!--</div>-->
+                <!---->
+            <!--</form>-->
+                        <form id="custom-search-form"  action="index.html" class="form-search form-horizontal pull-right">
+                <div class="input-append span12" id="side_search_form">
+                    <input type="text" name="q" id="tipue_search_input"
+                           pattern=".{3,}" title="At least 3 characters"
+                           required placeholder="Search">
+                    <button type="submit" class="btn search-query"><i class="glyphicon glyphicon-search"></i></button>
+                </div>
+            </form>
+            <div style="clear: both;"></div>
             <p class="lead">Table of Contents</p>
-            <label>Search<input type="text" id="search_toc"></label>
+
+            <!--<label>Search<input type="text" id="search_toc"></label>-->
             <div class="list-group" id="st_side_menu">
-
-
             </div>
+
         </div>
 
         <div class="col-md-9" id="doc_container">
+            <div id="tipue_search_content" style="display: none;">
+
+            </div>
 
 
         </div>
 
+            <!-- Footer -->
+            <div class="footer_cont">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Copyright &copy; UN Habitat</p>
+            </div>
+
+        </div>
+
+                </div>
     </div>
 
 </div>
 <!-- container -->
 
-<div class="container">
+<!--<div class="container">-->
 
-    <hr>
+<!--<div style="clear: both;"></div>-->
+    <!--&lt;!&ndash; Footer &ndash;&gt;-->
+    <!--<footer>-->
+        <!--<div class="row">-->
+            <!--<div class="col-lg-12">-->
+                <!--<p>Copyright &copy; UN Habitat</p>-->
+            <!--</div>-->
 
-    <!-- Footer -->
-    <footer>
-        <div class="row">
-            <div class="col-lg-12">
-                <p>Copyright &copy; UN Habitat</p>
-            </div>
-        </div>
-    </footer>
+        <!--</div>-->
+    <!--</footer>-->
 
-</div>
+<!--</div>-->
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/jstree_a6a0d0d/jstree.js"></script>
+
 
 <script>
 
@@ -163,13 +231,38 @@
             doc_script.setAttribute('src', js_doc_files[j]);
             document.head.appendChild(doc_script);
         }
+
     }
     insert_js_docs();
 
+    function prepare_content() {
+
+        if (window.location.search !== '' && window.location.hash == '') {
+            $('#tipue_search_content').show('slow')
+        }
+        else if (window.location.hash !== '') {
+//            $('#doc_container').html(window[current_name][0]);
+            var doc_name = window.location.hash.replace('#', '');
+            console.log(doc_name);
+            console.log(window['"'+doc_name+'"']);
+            $('#tipue_search_content').hide('slow');
+            $('#doc_container').html(window[doc_name][0]);
+        }
+        else {
+            $('#doc_container').html(window[current_name][0]);
+            $('#tipue_search_content').hide('slow')
+        }
+
+
+    }
+    $(window).load(function(){
+  prepare_content()
+});
     function setup_side_menu() {
-        $('#st_side_menu').html(window['toc_' + local_store.language][0]);
-        $('#doc_container').html(window[local_store.current_name][0]);
-        $('#st_side_menu').jstree({
+        $('#st_side_menu').html(window['toc_' + language][0]);
+
+
+        $('#st_side_menu').on('loaded.jstree', treeLoaded).jstree({
 
             "plugins": [
                 "contextmenu",
@@ -178,14 +271,19 @@
                 "types",
                 "changed"
             ],
+            "search": {
+
+                "case_insensitive": false,
+                "show_only_matches": true
+            },
             "types": {
                 "default": {
-                    //"icon": "images/book.png",
                     "icon": "glyphicon glyphicon-folder-open"
                 }
             }
 
         }).on('changed.jstree', function (NODE, REF_NODE) {
+            $("html, body").animate({ scrollTop: 0 });
             var clicked_file = REF_NODE.node.a_attr.href;
             if (clicked_file.length < 5) {
                 return
@@ -193,6 +291,16 @@
             var doc_name = clicked_file.split('.')[0].replace(/-/g, '_');
             $('#doc_container').html(window[doc_name]);
         });
+
+        function treeLoaded(event, data) {
+            var prev_node = $('#st_side_menu').find(current_name);
+            var prev_parent = $('#st_side_menu').jstree("get_parent", prev_node);
+//   console.log($('#st_side_menu').find(local_store.current_name));
+            $("#st_side_menu").jstree("select_node", prev_node);
+            $("#st_side_menu").jstree("select_node", prev_parent);
+            $("#st_side_menu").jstree("open_node", prev_parent);
+        }
+
         // bind customize icon change function in jsTree open_node event.
         $('#st_side_menu').on('open_node.jstree', function (e, data) {
             var icon = $('#' + data.node.id).find(
@@ -202,72 +310,94 @@
         });
         // bind customize icon change function in jsTree open_node event.
         $('#st_side_menu').on('select_node.jstree', function (e, data) {
-            window.location.hash = data.node.a_attr.href
+            if (data.node.a_attr.href != '') {
+                window.location.hash = data.node.a_attr.href.split('.')[0]
+            }
+            else {
+                window.location.hash = 'no_page';
+            }
+
         });
         // bind customize icon change function in jsTree close_node event.
         $('#st_side_menu').on('close_node.jstree', function (e, data) {
             var icon = $(
                 '#' + data.node.id).find(
-                    'i.jstree-icon.jstree-themeicon').first();
+                'i.jstree-icon.jstree-themeicon').first();
             icon.removeClass(
                 'glyphicon glyphicon-folder-open').addClass(
-                    'glyphicon glyphicon-folder-close');
+                'glyphicon glyphicon-folder-close');
         });
     }
+
     $(document).ready(function () {
         setup_side_menu();
 
     });
 
     // load languages list
-var option;
-for (var key in added_languages) {
-  if (added_languages.hasOwnProperty(key)) {
-      option += '<option value="'+ key + '">' +
-          added_languages[key] + '</option>';
-  }
-}
-$('#added_languages').append(option);
-$("#added_languages option[value='"+local_store.language+"']").prop('selected', true);
+    var option;
+    for (var key in added_languages) {
+        if (added_languages.hasOwnProperty(key)) {
+            option += '<option value="' + key + '">' +
+                added_languages[key] + '</option>';
+        }
+    }
+    $('#added_languages').append(option);
+    $("#added_languages option[value='" + language + "']").prop(
+        'selected', true
+    );
 
-
-// handle language changes
-    $('#added_languages').on('change', function() {
-        console.log(this.value);
-//        local_store.language = this.value;
-//        $('#st_side_menu').html(window['toc_'+this.value][0]);
-        file_setting_outdated = true;
+    // handle language changes
+    $('#added_languages').on('change', function () {
         // Set local storage before close.
         var sel_node = $("#st_side_menu").jstree("get_selected");
-
         if (sel_node.length < 1) {
-
-            sel_html = local_store.current_js_path;
+            sel_html = current_js_path;
         }
         else {
-            var sel_html = $('#'+sel_node).find('a').first()[0].href;
+            var sel_html = $('#' + sel_node).find('a').first()[0].href;
         }
-
         var curr_name = sel_html.split('/').reverse()[0].split('.')[0];
-        var doc_path = local_store.doc_path.split('/')[0] + '/' + this.value;
-        var curr_js_path  = doc_path + '/' + curr_name + '.js';
-         curr_data = {
-             'current_js_path': curr_js_path,
-            'current_name': curr_name,
-            'doc_path': doc_path, 'language': this.value
-         };
-         // Put the object into storage
-         localStorage.setItem(
-            'curr_data', JSON.stringify(curr_data)
-         );
+        var version = doc_path.split('/')[0];
+        var curr_doc_path = version + '/' + this.value;
+        var curr_js_path = curr_doc_path + '/' + curr_name + '.js';
 
-//         localStorage
-         file_store_outdated = true;
+        curr_data = {
+            'current_js_path': curr_js_path,
+            'current_name': curr_name,
+            'doc_path': curr_doc_path,
+            'language': this.value
+        };
+        // Put the object into storage
+        localStorage.setItem(
+            'curr_data', JSON.stringify(curr_data)
+        );
+        // reload the page to load with the new language content
         location.reload();
-//        setup_side_menu();
-//  alert( this.value );
-})
+    });
+
+    $(document).ready(function () {
+
+        $('#tipue_search_input').tipuesearch();
+$(window).on('hashchange',function(event, data){
+    console.log(event, data);
+    $('#tipue_search_content').hide('slow');
+    var doc_name = window.location.hash.replace('#', '');
+     $('#doc_container').html(window[doc_name]);
+
+});
+
+//        $('#refresh').on("click", function () {
+//            localStorage.clear();
+//            location.reload();
+//        });
+        $("#left").css({ 'height': (window.innerHeight - 140) + "px" });
+
+    });
+
+
 </script>
+<!--<a id="refresh">Refresh</a>-->
 </body>
 
 </html>

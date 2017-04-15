@@ -22,14 +22,12 @@ body {
     color: #333;
 }
 
-footer {
-    margin: 50px 0;
-}
 
 .navbar-inverse {
     background-color: rgba(212, 95, 0, 1);
     border-color: #ff5f00;
     color: #fff;
+    box-shadow: 0 2px 3px #777;
 }
 
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
@@ -41,7 +39,7 @@ footer {
     padding-left: 15px;
     margin-right: 10px;
     margin-left: 10px;
-    width: 99%;
+    width: 97%;
 }
 
 .col-md-3 {
@@ -63,8 +61,6 @@ footer {
 
 .col-md-3 {
     overflow: auto;
-    border-right: solid 2px #407dc7;
-    margin-right: -1px;
 }
 
 .nav.navbar-nav.navbar-right {
@@ -90,10 +86,27 @@ footer {
 .glyphicon {
     color: #407dc7;
 }
-
 div#doc_container {
     border-left: 2px solid #407dc7;
 }
+@media (min-width: 991px) {
+div#doc_container {
+    float: right;
+}
+
+div#left {
+    position: fixed;
+}
+footer {
+    margin: 0 0;
+    position: absolute;
+    bottom: 0;
+}
+}
+
+
+
+
 
 .navbar-brand {
     float: left;
@@ -127,4 +140,95 @@ div#bs-example-navbar-collapse-1 {
     text-align: center;
     line-height: 61px;
     font-size: 23px;
+}
+footer {
+    margin: 10px 0;
+}
+
+    #side_search_form {
+        margin:0;
+        margin-top: 5px;
+        padding: 0;
+    }
+
+   #tipue_search_foot_boxes {
+        padding-right: 3px;
+        padding-right: 4px \9;
+        padding-left: 3px;
+        padding-left: 4px \9;
+        /* IE7-8 doesn't have border-radius, so don't indent the padding */
+
+        margin-bottom: 0;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+    #side_search_form button {
+        border: 0;
+        background: none;
+        /** belows styles are working good */
+        padding: 2px 5px;
+        margin-top: 2px;
+        position: relative;
+        left: -28px;
+        /* IE7-8 doesn't have border-radius, so don't indent the padding */
+        margin-bottom: 0;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+    .search-query:focus + button {
+        z-index: 3;
+    }
+#tipue_search_input {
+    color: #333;
+    width: 84%;
+    max-width: 90%;
+    padding: 5px;
+    border: 1px solid #407dc7;
+    border-radius: 4px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    box-shadow: none;
+    outline: 0;
+    margin: 0;
+    margin-bottom: 18px;
+}
+hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 2px solid #407dc7;
+}
+form#custom-search-form {
+    width: 100%;
+}
+@media (max-width: 853px) {
+div#bs-example-navbar-collapse-1 {
+   font-size: 15px;
+}
+    .footer_cont .col-lg-12 {
+        width: 94%;
+    }
+}
+.footer_cont .col-lg-12 {
+    width: 94%;
+    float: right;
+    text-align: center;
+    padding-top: 16px;
+
+    line-height: 9px;
+    padding-bottom: 10px;
+    margin: 0 auto;
+}
+.footer_cont {
+    width: 96%;
+}
+@media (min-width: 992px){
+
+.col-md-3 {
+    width: 24%;
+}
 }

@@ -1,1 +1,1 @@
-{"en": "English", "fr": "French", "pt": "Portuguese", "ar": "Arabic", "de": "German", "es": "Spanish", "ar": "Arabic", "am": "Amharic", "pt": "Portuguese", "fr": "French", "pt": "Portuguese", "pt": "Portuguese", "pt": "Portuguese"}
+{"en": "English", "fr": "French", "pt": "Portuguese", "ar": "Arabic", "de": "German", "es": "Spanish", "ar": "Arabic", "am": "Amharic", "pt": "Portuguese", "fr": "French", "pt": "Portuguese", "pt": "Portuguese", "pt": "Portuguese", "fr": "French"}

@@ -45,7 +45,7 @@ from settings import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
-    LANGUAGES_WITH_CONTENT)
+    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML)
 
 
 class WebPage(QWebPage):
@@ -286,6 +286,11 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         file_name = os.path.basename(self._curr_file_path_js).split('.')[0]
         self.write_js_doc(file_name, json_data, path)
 
+    def get_html_content(self, content, tag):
+        pattern = re.compile(r'<'+tag+'.*?>(.+?)</'+tag+'>')
+        # result = pattern.search(content)
+        return re.findall(pattern, content)
+
     def create_js_doc(self):
         progress = QProgressDialog(self)
         title = QApplication.translate('HelpEditor', 'Generating...')
@@ -294,23 +299,38 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         progress.setValue(0)
         progress.open()
 
-
         for lang_code in self.added_languages.keys():
             doc_path = os.path.join(
                 PLUGIN_DIR, DOC, self.current_version, lang_code
             )
             js_files = []
+            search_cont = []
+
             for dir_path, sub_dirs, files in os.walk(doc_path):
+                if os.path.basename(dir_path) == 'images':
+                    continue
 
                 html_files = glob.glob('{}/*{}'.format(dir_path, '.html'))
                 html_files.extend(glob.glob('{}/*{}'.format(dir_path, '.htm')))
                 progress.setRange(0, len(html_files) - 1)
                 for i, html_file_path in enumerate(html_files):
+                    print os.path.basename(html_file_path)
+                    if TABLE_OF_CONTENT_HTML in html_file_path:
+                        continue
+                    searchable_data = {}
                     if os.path.basename(html_file_path) == '.':
-                        print html_file_path
                         continue
                     html_file = open(html_file_path, 'r')
                     data = html_file.read()
+                    title = self.get_html_content(data, 'title')
+                    if len(title) > 0:
+                        searchable_data['title'] = title[0]
+                        searchable_data['tags'] = title[0]
+                    else:
+                        searchable_data['title'] = ''
+                        searchable_data['tags'] = ''
+                    searchable_data['text'] = re.sub(r'title\S+\"', '', data)
+
                     json_data = json.dumps([data], ensure_ascii=False)
                     html_file.close()
 
@@ -319,23 +339,40 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
                     relative_path = '{}/{}/{}.js'.format(
                         self.current_version, lang_code, file_name)
+                    searchable_data['url'] = '#{}'.format(file_name)
+
+                    search_cont.append(searchable_data)
                     js_files.append(relative_path)
                     self.write_js_doc(file_name, json_data, path)
                     progress.setValue(i)
-                    toc_full_path = '{}/{}'.format(doc_path, TABLE_OF_CONTENT_JS)
-                    if i == 0:
-                        if os.path.isfile(toc_full_path):
-                            toc_rel_path = '{}/{}/{}'.format(
-                                self.current_version,
-                                lang_code,
-                                TABLE_OF_CONTENT_JS
-                            )
-                            js_files.append(toc_rel_path)
+                    # toc_full_path = '{}/{}'.format(doc_path, TABLE_OF_CONTENT_JS)
+                    # if i == 0:
+                    #     if os.path.isfile(toc_full_path):
+                    #         toc_rel_path = '{}/{}/{}'.format(
+                    #             self.current_version,
+                    #             lang_code,
+                    #             TABLE_OF_CONTENT_JS
+                    #         )
+                    #         js_files.append(toc_rel_path)
+                            # search_rel_path = '{}/{}/{}'.format(
+                            #     self.current_version,
+                            #     lang_code,
+                            #     SEARCH_DATA_JS
+                            # )
+                            # js_files.append(search_rel_path)
+
             js_doc_cont = open('{}/{}'.format(
                 doc_path, LIST_OF_JS_DOCS
             ), 'w')
             js_doc_cont.write('var js_doc_files = {};'.format(js_files))
             js_doc_cont.close()
+
+            js_search_cont = open('{}/{}'.format(
+                doc_path, SEARCH_DATA_JS
+            ), 'w')
+            js_search_cont.write('var tipuesearch = {"pages": %s };'
+                                 % search_cont)
+            js_search_cont.close()
         progress.hide()
 
     def write_js_doc(self, file_name, json_data, path):
@@ -380,7 +417,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             'full_img_path': '{}/{}'.format(self.full_language_dir, IMAGES),
             'relative_img_path': '{}/{}'.format(self.language_doc, IMAGES),
             'img_param': IMG_PARAM,
-            'images_folder': IMAGES
+            'images_folder': IMAGES,
+            'search_data': '{}/{}'.format(self.language_doc, SEARCH_DATA_JS)
         }
         output_file.write('var html_file = {};'.format(self._current_file))
         output_file.close()
@@ -458,10 +496,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
     def create_added_languages_js(self):
         path = '{}/{}/{}'.format(PLUGIN_DIR, DOC, LANGUAGES_WITH_CONTENT)
         js_file = open(path, 'w')
-        encoder = OrderedJsonEncoder()
-        ordered_json = encoder.encode(self.added_languages)
+        ordered_json = self.to_ordered_json(self.added_languages)
         js_file.write('var added_languages = {};'.format(ordered_json))
         js_file.close()
+
+    def to_ordered_json(self, ordered_dic):
+        encoder = OrderedJsonEncoder()
+        ordered_json = encoder.encode(ordered_dic)
+        return ordered_json
 
     def on_add_language(self):
         add_language = AddLanguage(self.current_version, self)
@@ -471,9 +513,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         service = QDesktopServices()
         self.create_js_doc()
         url = QUrl.fromLocalFile(PREVIEW_URL)
-        url.setQueryItems([('mode', 'preview')])
-        url.setFragment('preview')
-
         service.openUrl(url)
 
 class OrderedJsonEncoder( simplejson.JSONEncoder ):

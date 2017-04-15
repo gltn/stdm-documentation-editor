@@ -86,7 +86,8 @@ class TocTreeMenu(QTreeWidget):
     def create_json_table_of_contents(self):
 
         toc_json = open(self.contents_js_path, 'w')
-        json_data = json.dumps([self.memory_toc_html.getvalue()], ensure_ascii=False)
+        json_data = json.dumps(
+            [self.memory_toc_html.getvalue()], ensure_ascii=False)
         toc_json.write('var toc_{} = {};'.format(
                 os.path.basename(self.curr_language_path),json_data
             )
