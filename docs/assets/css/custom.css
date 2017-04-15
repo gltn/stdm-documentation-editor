@@ -214,21 +214,30 @@ div#bs-example-navbar-collapse-1 {
     }
 }
 .footer_cont .col-lg-12 {
-    width: 94%;
+    width: 30%;
     float: right;
-    text-align: center;
+    text-align: right;
     padding-top: 16px;
-
     line-height: 9px;
     padding-bottom: 10px;
     margin: 0 auto;
 }
 .footer_cont {
-    width: 96%;
+    width: 99%;
 }
 @media (min-width: 992px){
 
 .col-md-3 {
     width: 24%;
 }
+}
+.tipue_search_content_text h1 {
+    display: none;
+}
+.navbar-inverse .navbar-toggle:hover {
+    background-color: #407dc7;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: #1b68bf;
 }

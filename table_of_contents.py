@@ -92,10 +92,8 @@ class TocTreeMenu(QTreeWidget):
                 os.path.basename(self.curr_language_path),json_data
             )
         )
-        # print os.path.basename(self.curr_language_path)
         toc_json.close()
         self.memory_toc_html.truncate(0)
-        print self.memory_toc_html.getvalue()
 
     def create_table_of_contents(self, contents, root, widgets=True):
         print >> self.memory_toc_html, '<ul>'
@@ -143,7 +141,6 @@ class TocTreeMenu(QTreeWidget):
     def on_item_changed(self):
         item = self.currentItem()
         new_title = item.text(0)
-        print new_title
         link = item.data(0, Qt.UserRole).toString()
         self.xml_util.change_title(new_title, link)
         contents_data = self.xml_util.xml_point_attributes('toc')

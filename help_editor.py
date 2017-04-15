@@ -47,21 +47,10 @@ from settings import (
     LIST_OF_JS_DOCS,
     LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML)
 
-
-class WebPage(QWebPage):
-    def javaScriptConsoleMessage(self, msg, line, source):
-        print '%s line %d: %s' % (source, line, msg)
-
-
 class HelpEditor(QMainWindow, Ui_HelpEditor):
-
     window_loaded = pyqtSignal()
-
     def __init__(self):
-
-        # TODO fix image drag drop small size after tree item click
         QMainWindow.__init__(self)
-
         self.setupUi(self)
         self._curr_file_path = None
         self._curr_file_path_js = None
@@ -74,8 +63,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.on_editor_loaded()
         self.current_lang_name = 'English'
         self.current_lang_code = 'en'
-        # page = WebPage()
-        # self.content_editor.setPage(page)
         self.language_doc = LANGUAGE_DOC
         self.current_version = DEFAULT_VERSION
         self.prev_version = None
@@ -158,7 +145,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # remove margins
         self.centralWidget().layout().setContentsMargins(0,0,0,0)
         self.content_editor.urlChanged.connect(self.on_url_changed)
-
         self.add_language_cbo.clicked.connect(self.on_add_language)
         self.image_browse_btn.clicked.connect(self.file_dialog)
         self.window_loaded.connect(self.on_widow_loaded)
@@ -288,7 +274,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
     def get_html_content(self, content, tag):
         pattern = re.compile(r'<'+tag+'.*?>(.+?)</'+tag+'>')
-        # result = pattern.search(content)
         return re.findall(pattern, content)
 
     def create_js_doc(self):
@@ -314,7 +299,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 html_files.extend(glob.glob('{}/*{}'.format(dir_path, '.htm')))
                 progress.setRange(0, len(html_files) - 1)
                 for i, html_file_path in enumerate(html_files):
-                    print os.path.basename(html_file_path)
                     if TABLE_OF_CONTENT_HTML in html_file_path:
                         continue
                     searchable_data = {}
@@ -345,22 +329,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     js_files.append(relative_path)
                     self.write_js_doc(file_name, json_data, path)
                     progress.setValue(i)
-                    # toc_full_path = '{}/{}'.format(doc_path, TABLE_OF_CONTENT_JS)
-                    # if i == 0:
-                    #     if os.path.isfile(toc_full_path):
-                    #         toc_rel_path = '{}/{}/{}'.format(
-                    #             self.current_version,
-                    #             lang_code,
-                    #             TABLE_OF_CONTENT_JS
-                    #         )
-                    #         js_files.append(toc_rel_path)
-                            # search_rel_path = '{}/{}/{}'.format(
-                            #     self.current_version,
-                            #     lang_code,
-                            #     SEARCH_DATA_JS
-                            # )
-                            # js_files.append(search_rel_path)
-
             js_doc_cont = open('{}/{}'.format(
                 doc_path, LIST_OF_JS_DOCS
             ), 'w')
@@ -439,7 +407,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         html = '<img src="{}" alt="{}" style="width:120px;">'.format(
             rel_path.lstrip('\\').lstrip('/'), os.path.basename(rel_path)
         )
-        # print rel_path
         self.image_browser.page().mainFrame().documentElement().\
             findFirst("ul").prependInside(html)
 
