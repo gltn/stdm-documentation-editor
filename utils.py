@@ -102,23 +102,25 @@ def copy_directory(src, dst):
 
 
 def copy_file(source_file_path, path):
-    destination_file = None
-    file = os.path.basename(str(source_file_path))
-    destination = os.path.join(path, file)
+    file_name = os.path.basename(str(source_file_path))
+    destination = os.path.join(path, file_name)
     if not os.path.isfile(destination):
-        destination_file = destination
+        destination_file_path = file_name
         shutil.copyfile(source_file_path, destination)
     else:
-        base, extension = os.path.splitext(file)
-        i = 1
-        while True:
-            new_name = os.path.join(
-                path, '{}_{}{}'.format(base, i, extension)
-            )
+        destination_file_path = get_next_name(file_name, path)
+        shutil.copy(source_file_path, destination_file_path)
+    return destination_file_path
 
-            if not os.path.exists(new_name):
-                destination_file = new_name
-                shutil.copy(source_file_path, new_name)
-                break
-            i += 1
-    return destination_file
+
+def get_next_name(file_name, path):
+    base, extension = os.path.splitext(file_name)
+    i = 1
+    while True:
+        new_path = os.path.join(
+            path, '{}_{}{}'.format(base, i, extension)
+        )
+
+        if not os.path.exists(new_path):
+            return new_path
+        i += 1

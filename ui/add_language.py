@@ -77,4 +77,3 @@ class AddLanguage(QDialog, Ui_AddLanguage):
                 'Please choose or add a language with its code.'
             )
             QMessageBox.information(self._help_editor, title, message)
-            # self.accept()

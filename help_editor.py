@@ -21,7 +21,7 @@ from PyQt4.QtGui import QMessageBox
 from PyQt4.QtGui import QProgressDialog
 from PyQt4.QtWebKit import QWebSettings, QWebPage
 
-from utils import get_images, get_gallery_images
+from utils import get_images, get_gallery_images, get_next_name
 from table_of_contents import TocTreeMenu
 from ui.add_language import AddLanguage
 from ui.ui_help_editor import Ui_HelpEditor
@@ -282,14 +282,17 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         path = self.folder_dialog()
         progress = self.create_js_doc()
         progress.open()
-        zip_file = zipfile.ZipFile('{}/stdm_docs.zip'.format(path), 'w')
+        zip_file_path = '{}/stdm_docs.zip'.format(path)
+        if os.path.isfile(zip_file_path):
+            zip_file_path = get_next_name('stdm_docs.zip', path)
+
+        zip_file = zipfile.ZipFile(zip_file_path, 'w')
         for dir_name, sub_dirs, files in os.walk(DOC):
             progress.setRange(0, len(files) - 1)
             if dir_name.startswith(os.path.join(DOC, 'js')):
                 continue
             else:
                 zip_file.write(dir_name)
-
             for i, filename in enumerate(files):
                 progress.setValue(i)
                 if dir_name == DOC:
@@ -412,7 +415,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.set_current_file(current_doc, current_title)
         self.current_item = self.toc.widget_items[str(current_doc)]
         self.setWindowTitle(
-            'STDM Documentation Editor -{}'.format(self._curr_title)
+            'STDM Documentation Editor - {}'.format(self._curr_title)
         )
         self.content_editor.blockSignals(True)
         self.load_content_js()
@@ -454,8 +457,10 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.web_frame.evaluateJavaScript(QString(js))
 
     def load_image(self, destination_file):
-        img_name = os.path.basename(destination_file)
-        rel_path = '{}/{}/{}'.format(self.language_doc, IMAGES, img_name)
+
+        rel_path = '{}/{}/{}'.format(
+            self.language_doc, IMAGES, destination_file
+        )
         html = '<img src="{}" alt="{}" style="width:120px;">'.format(
             rel_path.lstrip('\\').lstrip('/'), os.path.basename(rel_path)
         )
@@ -491,7 +496,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         )
         return files
 
-
     def folder_dialog(self):
         """
         Displays a file dialog to choose the destination folder of the zip.
@@ -511,8 +515,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         )
         return str(path)
 
-    def save_local_images(self):
-        files = self.file_dialog()
+    def save_local_images(self, files=None):
+        if files is None:
+            files = self.file_dialog()
         path = os.path.join(PLUGIN_DIR, DOC, self.language_doc, IMAGES)
         destination_files = []
         for file_path in files:

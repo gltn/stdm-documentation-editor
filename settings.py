@@ -17,7 +17,10 @@ LANGUAGE = 'en'
 
 IMAGES = 'images'
 IMG_PARAM = 'image_path'
-IMAGE_TYPES = {'png': '*.png', 'jpg': '*.jpg', 'tif': '*.tif', 'bmp': '*.bmp', 'svg': '*.svg'}
+IMAGE_TYPES = {
+    'png': '*.png', 'jpg': '*.jpg', 'tif': '*.tif',
+    'bmp': '*.bmp', 'svg': '*.svg'
+}
 DOC = 'docs'
 HELP_EDITOR_HTML = '{}/help.html'.format(DOC)
 CURRENT_FILE = '{}/current_file.js'.format(DOC)
