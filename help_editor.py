@@ -296,6 +296,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     if filename == 'index.html' or \
                                     filename == 'current_file.js':
                         zip_file.write(os.path.join(dir_name, filename))
+                else:
+                    zip_file.write(os.path.join(dir_name, filename))
 
         zip_file.close()
         progress.close()
@@ -303,8 +305,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         message = QApplication.translate(
             'HelpEditor',
             'You have successfully exported the documentation.\n'
-            'To access the contents, extract the zip and \n'
-            'open the index.html file located in the docs folder. '
+            'To access the contents, extract the zip file starting '
+            'with stdm_docs and open the index.html file in the docs folder. '
         )
         QMessageBox.information(self, title, message)
 
