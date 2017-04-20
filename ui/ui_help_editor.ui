@@ -169,6 +169,7 @@
     <addaction name="action_download"/>
     <addaction name="separator"/>
     <addaction name="action_preview"/>
+    <addaction name="action_export_zip"/>
    </widget>
    <widget class="QMenu" name="menuRegister">
     <property name="title">
@@ -203,6 +204,11 @@
   <action name="action_preview">
    <property name="text">
     <string>Preview in Browser</string>
+   </property>
+  </action>
+  <action name="action_export_zip">
+   <property name="text">
+    <string>Export as Zip</string>
    </property>
   </action>
  </widget>

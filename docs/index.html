@@ -1,227 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>User Manual | Social Tenure Domain Model</title>
-
+    <script src="assets/js/jquery.js " type="text/javascript"></script>
+    <script type="text/javascript"
+            src="assets/js/tipue_search_6_0/tipuesearch_set.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="assets/js/tipue_search_6_0/css/tipuesearch.css">
+    <script type="text/javascript"
+            src="assets/js/tipue_search_6_0/tipuesearch.min.js"></script>
 
     <!-- Bootstrap Core CSS -->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
     <link href="assets/css/custom.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/js/jstree_a6a0d0d/themes/default/style.css" />
-    <script src="assets/js/jquery.js " type="text/javascript"></script>
-<!--<script>$.getScript(html_file.doc_path + '/' + 'table_of_contents.js');</script>-->
+    <link rel="stylesheet"
+          href="assets/js/jstree_a6a0d0d/themes/default/style.css"/>
 
-<!-- jQuery -->
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--&lt;!&ndash;[if lt IE 9]>-->
-        <!--<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>-->
-        <!--<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>-->
-    <!--<![endif]&ndash;&gt;-->
- <script src="current_file.js"></script>
-<script>
-    var toc_src = html_file.doc_path+'/table_of_contents.js';
-//        script_wrapper.innerHTML = '<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>';
+    <script src="current_file.js"></script>
+    <script src="languages_with_content.js"></script>
+    <script src="assets/js/init_globals.js"></script>
 
-       document.write('<'+'script src="'+toc_src+'" type="text/javascript"><' + '/script'+'>');
-               var doc_src = html_file.current_js;
-         document.write('<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>');
-
-</script>
 </head>
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">STDM User Manual</a>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="#">About</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Contact</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
-    </nav>
-
-    <!-- Page Content -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html"><img
+                    src="images/logo.png"></a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse"
+             id="bs-example-navbar-collapse-1">
+            STDM 1.5 User Manual
+            <!--<ul class="nav navbar-nav">-->
+            <!--<li>-->
+            <!--<a href="#">Installing STDM</a>-->
+            <!--</li>-->
 
-        <div class="row">
+            <!--<li>-->
+            <!--<a href="#">About</a>-->
+            <!--</li>-->
+            <!--</ul>-->
+            <div class="nav navbar-nav navbar-right">
 
-            <div class="col-md-3">
-                <p class="lead">Table of Contents</p>
-                <label>Search<input type="text" id="search_toc"></label>
-                <div class="list-group" id="st_side_menu">
+                <select class="form-control" id="stdm_version"
+                        data-width="fit">
+                    <option value="1_5">STDM 1.5</option>
+                </select>
 
+                <select class="form-control" id="added_languages"
+                        data-width="fit">
 
+                </select>
+            </div>
 
+        </div>
+        <!-- /.navbar-collapse -->
+
+    </div>
+    <!-- /.container -->
+</nav>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-3" id="left">
+
+            <form id="custom-search-form" action="index.html"
+                  class="form-search form-horizontal pull-right">
+                <div class="input-append span12" id="side_search_form">
+                    <input type="text" name="q" id="tipue_search_input"
+                           pattern=".{3,}" title="At least 3 characters"
+                           required placeholder="Search">
+                    <button type="submit" class="btn search-query"><i
+                            class="glyphicon glyphicon-search"></i></button>
                 </div>
+            </form>
+            <div style="clear: both;"></div>
+            <p class="lead">Table of Contents</p>
+
+            <div class="list-group" id="st_side_menu">
             </div>
 
-            <div class="col-md-9" id="doc_container">
+        </div>
 
+        <div class="col-md-9" id="doc_container">
+            <div id="tipue_search_content" style="display: none;">
 
             </div>
+
 
         </div>
 
     </div>
-    <!-- /.container -->
 
-    <div class="container">
-
-        <hr>
-
+</div>
         <!-- Footer -->
-        <footer>
+        <div class="footer_cont">
+
             <div class="row">
                 <div class="col-lg-12">
                     <p>Copyright &copy; UN Habitat</p>
                 </div>
+
             </div>
-        </footer>
 
-    </div>
-    <script src="assets/js/bootstrap.min.js" ></script>
-    <script src="assets/js/jstree_a6a0d0d/jstree.js" ></script>
+        </div>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jstree_a6a0d0d/jstree.js"></script>
+<script src="assets/js/interface_handler.js"></script>
 
-<script>
-
-
-    $(document).ready(function() {
-        $('#st_side_menu').html(toc[0]);
-        $('#doc_container').html(doc[0]);
-    $('#st_side_menu').jstree({
-
-        "plugins": [
-            "checkbox",
-            "contextmenu",
-            "dnd",
-            "massload",
-            "search",
-            "sort",
-            "state",
-            "types",
-            "unique",
-            "wholerow",
-            "changed",
-            "conditionalselect"
-        ],
-        "types": {
-            "default": {
-                "icon": "images/book.png"
-            },
-            "moveType": {
-                "icon": "glyphicon glyphicon-transfer"
-            }
-        }
-    }).bind("select_node.jstree", function (NODE, REF_NODE) {
-
-//            var a = $.jstree._focused().get_selected();
-                var clicked_file = REF_NODE.node.a_attr.href;
-                var prev_doc_src = doc_src;
-                var prev_doc = doc;
-                doc_src = html_file.doc_path + '/'+ clicked_file.split('.')[0] + '.js';
-//               console.log(document.getElementsByTagName('script'));
-              var scripts = document.getElementsByTagName('script');
-               for (var i = 0; i < scripts.length; i++){
-//                   console.log(scripts[i].src, doc_src);
-                   if (scripts[i].src.indexOf(prev_doc_src) > 0){
-
-                            scripts[i].remove();
-                                    var my_awesome_script = document.createElement('script');
-
-                                    my_awesome_script.setAttribute('src',doc_src);
-                                    //
-                                    document.head.appendChild(my_awesome_script);
-                                    $('#doc_container').html(doc[0]);
-                                    break;
-                        }
-               }
-//                            var doc_src = html_file.current_js;
-
-//         document.write('<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>');
-//
-////
-
-//                 script_wrapper.innerHTML = '<'+'script src="'+doc_src+'" type="text/javascript"><' + '/script'+'>';
-//                var imported = document.createElement('script');
-//            imported.src = doc_src;
-////            var new_doc;
-//            new_doc = doc;
-//            document.head.appendChild(imported);
-//                document.write('<'+'script src="'+doc_src+
-//                    '" type="text/javascript"><' + '/script'+'>');
-//        console.log(doc[0]);
-//                var wrapper= document.createElement('div');
-//                wrapper.innerHTML= doc[0];
-//                var doc_body = wrapper.getElementsByTagName('body');
-//                var content = doc_body.innerHTML;
-//                var doc_cont = document.getElementById('doc_container');
-//                doc_cont.innerHTML = doc[0];
-//                return false;
-//                console.log(doc[0]);
-
-
-//                $('#doc_container').html(doc[0]);
-        })
-
-    });
-
-        var to = false;
-  $('#search_toc').keyup(function () {
-    if(to) { clearTimeout(to); }
-    to = setTimeout(function () {
-      var v = $('#search_toc').val();
-      $('#st_side_menu').jstree(true).search(v);
-    }, 250);
-
-
-
-//
-//
-//$("#st_side_menu").bind('select_node.jstree', function(e) {
-//    // gather ids of selected nodes
-//    var selected_ids = [];
-//    $("#st_side_menu").jstree('get_selected').each(function () {
-//        selected_ids.push(this.id);
-//    });
-//    // do summit with them
-//    $('#st_side_menu').text('selected '+selected_ids);
-//
-//    console.log(selected_ids);
-//});
-});
-</script>
 </body>
 
 </html>

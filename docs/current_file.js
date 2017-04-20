@@ -1,0 +1,1 @@
+var html_file = {'current': '1_5/en/preface.htm', 'full_img_path': 'd:\\home\\qgisapp\\STDM\\dev\\SDE\\editor\\docs\\1_5\\en/images', 'doc_path': '1_5/en', 'current_js': '1_5/en/preface.js', 'title': 'Preface', 'images_folder': 'images', 'img_param': 'image_path', 'relative_img_path': '1_5/en/images'};
