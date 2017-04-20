@@ -136,11 +136,14 @@ class Ui_HelpEditor(object):
         self.actionUpdate.setObjectName(_fromUtf8("actionUpdate"))
         self.action_preview = QtGui.QAction(HelpEditor)
         self.action_preview.setObjectName(_fromUtf8("action_preview"))
+        self.action_export_zip = QtGui.QAction(HelpEditor)
+        self.action_export_zip.setObjectName(_fromUtf8("action_export_zip"))
         self.menuFile.addAction(self.action_submit)
         self.menuFile.addAction(self.actionUpdate)
         self.menuFile.addAction(self.action_download)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.action_preview)
+        self.menuFile.addAction(self.action_export_zip)
         self.menuRegister.addAction(self.action_register)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuRegister.menuAction())
@@ -164,5 +167,6 @@ class Ui_HelpEditor(object):
         self.action_register.setText(_translate("HelpEditor", "Register on GitHub", None))
         self.actionUpdate.setText(_translate("HelpEditor", "Update", None))
         self.action_preview.setText(_translate("HelpEditor", "Preview in Browser", None))
+        self.action_export_zip.setText(_translate("HelpEditor", "Export as Zip", None))
 
 from PyQt4 import QtWebKit

@@ -104,4 +104,4 @@ docs/images.js
 !docs/2_0/**/preface.htm
 !docs/2_1/**/preface.htm
 .idea
-*.ipynb
+languages_with_content.js
