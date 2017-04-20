@@ -48,7 +48,8 @@ from settings import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
-    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML)
+    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
+    NO_LANG_ERROR)
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
@@ -87,10 +88,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
         if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
             self.switch_table_of_content('preface.htm')
-            self.current_item = self.toc.widget_items['preface.htm']
-            title = str(self.current_item.text(0))
-            self.set_current_file('preface.htm', title)
-            self.toc.setCurrentItem(self.current_item)
+            if hasattr(self.toc, 'widget_items'):
+                self.current_item = self.toc.widget_items['preface.htm']
+                title = str(self.current_item.text(0))
+                self.set_current_file('preface.htm', title)
+                self.toc.setCurrentItem(self.current_item)
+                return
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())
@@ -225,12 +228,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.toc.update_contents_path(
                 self.full_language_dir, updated_info
             )
-
-            current_widget_item = self.toc.widget_items[prev_toc_link]
-            self.toc.setCurrentItem(current_widget_item)
-            current_title = str(current_widget_item.text(0))
-            self.set_current_file(prev_toc_link, current_title)
-            self.get_item_url(current_widget_item)
+            if hasattr(self.toc, 'widget_items'):
+                current_widget_item = self.toc.widget_items[prev_toc_link]
+                self.toc.setCurrentItem(current_widget_item)
+                current_title = str(current_widget_item.text(0))
+                self.set_current_file(prev_toc_link, current_title)
+                self.get_item_url(current_widget_item)
 
     def copy_language(self):
         prev_language_dir = os.path.join(
@@ -447,12 +450,13 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         output_file.close()
 
     def load_content_js(self):
+        if hasattr(self.toc, 'widget_items'):
+            js = """
+                jQuery(document).ready(function() {
+                    jQuery(document).trigger('customChangeEvent', %s);
+                });
+            """ % self._current_file
 
-        js = """
-            jQuery(document).ready(function() {
-                jQuery(document).trigger('customChangeEvent', %s);
-            });
-        """ % self._current_file
         QApplication.processEvents()
         self.web_frame.evaluateJavaScript(QString(js))
 
@@ -468,7 +472,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             findFirst("ul").prependInside(html)
 
     def on_editor_loaded(self):
-
+        # TODO create a generic function to set html/file into the content editor
         help_url = QUrl()
 
         help_url.setPath(self.help_path)

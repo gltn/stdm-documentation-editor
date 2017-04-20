@@ -162,10 +162,10 @@
 
         });
 
-//        $('#refresh').on("click", function () {
-//            localStorage.clear();
-//            location.reload();
-//        });
+       $('#refresh2').on("click", function () {
+           localStorage.clear();
+           location.reload();
+       });
         $("#left").css({'height': (window.innerHeight - 90) + "px"});
 
     });

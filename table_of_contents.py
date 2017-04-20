@@ -74,10 +74,11 @@ class TocTreeMenu(QTreeWidget):
         self.curr_language_path = path
 
         self.parent = None
-        self.widget_items.clear()
-        self.blockSignals(True)
-        self.save_table_of_contents(self.contents_data)
-        self.blockSignals(False)
+        if hasattr(self, 'widget_items'):
+            self.widget_items.clear()
+            self.blockSignals(True)
+            self.save_table_of_contents(self.contents_data)
+            self.blockSignals(False)
 
     def save_table_of_contents(self, contents_data, widgets=True):
         self.create_table_of_contents(contents_data, self, widgets)
