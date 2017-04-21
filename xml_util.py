@@ -87,13 +87,13 @@ class XmlUtil():
         node_list = self.find_xml_node(xml_feature_name)
 
         QApplication.processEvents()
-        attribute = None
+        attribute = []
         for j, nod in enumerate(node_list):
 
             child = nod.childNodes()
 
             attribute = self.extract_data(child)
-            if attribute is None:
+            if attribute == []:
                 continue
 
         return attribute

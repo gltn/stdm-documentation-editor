@@ -78,12 +78,12 @@ class GitWrapper(object):
 
 if __name__ == '__main__':
     cdir = '\\{}'.format(DOC_CLONE_DIR)
-    gw = GitWrapper(cdir)
-    gw.git_add()
+    #gw = GitWrapper(cdir)
+    #gw.git_add()
     #gw.make_symlink()
-    #app = QApplication(sys.argv)
-    #window = HelpEditor()
-    #window.show()
-    #sys.exit(app.exec_()) 
+    app = QApplication(sys.argv)
+    window = HelpEditor()
+    window.show()
+    sys.exit(app.exec_()) 
 
 

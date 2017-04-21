@@ -31,8 +31,9 @@ class TocTreeMenu(QTreeWidget):
 
         self.memory_toc_html = cStringIO.StringIO()
 
-        if self.contents_data is None:
-            return
+        #if self.contents_data is None:
+            #return
+
         self.parent = None
         self.widget_items = {}
         self.contents_html_path = '{}/{}'.format(

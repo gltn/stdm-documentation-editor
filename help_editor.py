@@ -8,7 +8,9 @@ import zipfile
 from HTMLParser import HTMLParser
 from collections import OrderedDict
 
-import simplejson as simplejson
+try: import simplejson as simplejson
+except ImportError:import json as simplejson
+
 from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
@@ -79,6 +81,13 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.current_document = None
         self._current_file = None
         self.added_languages = OrderedDict()
+        self.start_page = 'preface.htm'
+
+        if not os.path.isdir(self.full_language_dir):
+            self.full_language_dir = os.path.join(
+                    PLUGIN_DIR, DOC)
+            self.start_page = 'help.htm'
+
         self.init_gui()
 
         self.on_show_gallery()
@@ -86,11 +95,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # Start with the first page if current_file.js doesn't exist
 
         if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
-            self.switch_table_of_content('preface.htm')
-            self.current_item = self.toc.widget_items['preface.htm']
-            title = str(self.current_item.text(0))
-            self.set_current_file('preface.htm', title)
-            self.toc.setCurrentItem(self.current_item)
+            if bool(self.toc.widget_items):
+                self.switch_table_of_content(self.start_page)
+                self.current_item = self.toc.widget_items[self.start_page]
+                title = str(self.current_item.text(0))
+                self.set_current_file(self.start_page, title)
+                self.toc.setCurrentItem(self.current_item)
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())

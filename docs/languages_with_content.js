@@ -1,1 +1,1 @@
-var added_languages = {"en":"English","fr":"France","pt":"Portuguese"};
+var added_languages = {};
