@@ -49,7 +49,7 @@ from settings import (
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
     LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
-    NO_LANG_ERROR)
+    NO_DOCS_ERROR, PREFACE_TITLE)
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
@@ -90,10 +90,11 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.switch_table_of_content('preface.htm')
             if hasattr(self.toc, 'widget_items'):
                 self.current_item = self.toc.widget_items['preface.htm']
-                title = str(self.current_item.text(0))
-                self.set_current_file('preface.htm', title)
                 self.toc.setCurrentItem(self.current_item)
-                return
+                self.set_current_file('preface.htm', PREFACE_TITLE)
+            else:
+                self.load_content_js()
+
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())
@@ -101,6 +102,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.setWindowTitle(
                 'STDM Documentation Editor - {}'.format(self._curr_title)
             )
+
 
     def read_current_file(self):
         string = open(CURRENT_FILE, 'r').read()
@@ -446,6 +448,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             'images_folder': IMAGES,
             'search_data': '{}/{}'.format(self.language_doc, SEARCH_DATA_JS)
         }
+        QApplication.processEvents()
         output_file.write('var html_file = {};'.format(self._current_file))
         output_file.close()
 
@@ -456,6 +459,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     jQuery(document).trigger('customChangeEvent', %s);
                 });
             """ % self._current_file
+        else:
+            js = """
+                jQuery(document).ready(function() {
+                    jQuery(document).trigger('errorChangeEvent', '%s');
+                });
+            """ % NO_DOCS_ERROR
 
         QApplication.processEvents()
         self.web_frame.evaluateJavaScript(QString(js))

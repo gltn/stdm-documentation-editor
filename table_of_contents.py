@@ -13,7 +13,7 @@ from xml_util import XmlUtil
 from settings import (
     TABLE_OF_CONTENT_HTML,
     TABLE_OF_CONTENT_XML,
-    LANGUAGE, PLUGIN_DIR, DOC, DEFAULT_VERSION, TABLE_OF_CONTENT_JS)
+    TABLE_OF_CONTENT_JS)
 
 
 class TocTreeMenu(QTreeWidget):
