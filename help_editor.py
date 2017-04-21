@@ -96,13 +96,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # Start with the first page if current_file.js doesn't exist
 
         if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
-            self.switch_table_of_content('preface.htm')
-            if hasattr(self.toc, 'widget_items'):
-                self.current_item = self.toc.widget_items['preface.htm']
-                title = str(self.current_item.text(0))
-                self.set_current_file('preface.htm', title)
-                self.toc.setCurrentItem(self.current_item)
-                return
+            if bool(self.toc.widget_items):
+                self.switch_table_of_content(self.start_page)
+                if hasattr(self.toc, 'widget_items'):
+                    self.current_item = self.toc.widget_items[self.start_page]
+                    title = str(self.current_item.text(0))
+                    self.set_current_file(self.start_page, title)
+                    self.toc.setCurrentItem(self.current_item)
+                    return
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())
@@ -163,6 +164,11 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.add_language_cbo.clicked.connect(self.on_add_language)
         self.image_browse_btn.clicked.connect(self.file_dialog)
         self.window_loaded.connect(self.on_widow_loaded)
+
+        # Download/clone
+        self.action_download.triggered.connect(self.on_download_repo)
+        #
+
         self.action_preview.triggered.connect(self.on_preview_in_browser)
         self.action_export_zip.triggered.connect(self.export_doc_to_zip)
         self.populate_languages()
@@ -570,6 +576,11 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.create_js_doc()
         url = QUrl.fromLocalFile(PREVIEW_URL)
         service.openUrl(url)
+
+    def on_download_repo(self):
+        from git_editor import CloneEditor
+        editor = CloneEditor(self)
+        editor.exec_()
 
 class OrderedJsonEncoder( simplejson.JSONEncoder ):
    def encode(self, data):
