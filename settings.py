@@ -41,3 +41,4 @@ SEARCH_DATA_JS = 'search_data.js'
 TABLE_OF_CONTENT_XML = 'table_of_contents.xml'
 HOME = expanduser("~")
 LANGUAGES_WITH_CONTENT = 'languages_with_content.js'
+NO_LANG_ERROR = 'error_no_language.html'

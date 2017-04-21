@@ -1,1 +1,0 @@
-var added_languages = {};
