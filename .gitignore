@@ -88,20 +88,14 @@ ENV/
 # Rope project settings
 .ropeproject
 docs/1_5
+docs/1_6
 docs/2_0
 docs/2_1
 # Dynamically generated .JS files
 docs/current_file.js
 docs/gallery_list.js
 docs/images.js
-!docs/1_5/**/table_of_contents.xml
-!docs/1_5/**/table_of_contents.html
-!docs/2_0/**/table_of_contents.xml
-!docs/2_0/**/table_of_contents.html
-!docs/2_1/**/table_of_contents.xml
-!docs/2_1/**/table_of_contents.html
-!docs/1_5/**/preface.htm
-!docs/2_0/**/preface.htm
-!docs/2_1/**/preface.htm
 .idea
-languages_with_content.js
+docs/languages_with_content.js
+docs/1_5/table_of_contents.js
+docs/assets/js/tipue_search_6_0/demo/

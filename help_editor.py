@@ -98,6 +98,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # Start with the first page if current_file.js doesn't exist
 
         if not os.path.isfile(CURRENT_FILE_DOC) or self._current_file is None:
+            # print self.toc.widget_items
+            # # if len(self.toc.widget_items) > 0:
             self.switch_table_of_content('preface.htm')
             if hasattr(self.toc, 'widget_items'):
                 self.current_item = self.toc.widget_items['preface.htm']
