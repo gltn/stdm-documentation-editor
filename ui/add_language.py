@@ -4,11 +4,12 @@ from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QDialog
 from PyQt4.QtGui import QMessageBox
 
-from settings import LANGUAGES, PLUGIN_DIR, DOC, LANG_SETTING_FILE
+
 from ui_add_language import Ui_AddLanguage
 
 
 class AddLanguage(QDialog, Ui_AddLanguage):
+
     def __init__(self, version, parent):
         QDialog.__init__(self, parent)
         self._curr_version = version
@@ -17,6 +18,7 @@ class AddLanguage(QDialog, Ui_AddLanguage):
         self.populate_languages()
 
     def populate_languages(self):
+        from ..__init__ import LANGUAGES, PLUGIN_DIR, DOC
         self.select_language_cbo.addItem('', None)
         for code, language in LANGUAGES.iteritems():
             doc_dir = os.path.join(PLUGIN_DIR, DOC, self._curr_version, code)
@@ -45,6 +47,7 @@ class AddLanguage(QDialog, Ui_AddLanguage):
 
 
     def set_language(self, lang_name, lang_code):
+        from ..__init__ import LANG_SETTING_FILE
         new_lag_entry = '"{}": "{}"'.format(lang_code, lang_name)
         lang_file = open(LANG_SETTING_FILE, 'r')
         lang_list = lang_file.read()

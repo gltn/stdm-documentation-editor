@@ -10,10 +10,10 @@ from PyQt4.QtGui import QTreeWidget
 from PyQt4.QtGui import QTreeWidgetItem
 
 from xml_util import XmlUtil
-from settings import (
+from __init__ import (
     TABLE_OF_CONTENT_HTML,
     TABLE_OF_CONTENT_XML,
-    LANGUAGE, PLUGIN_DIR, DOC, DEFAULT_VERSION, TABLE_OF_CONTENT_JS)
+    TABLE_OF_CONTENT_JS)
 
 
 class TocTreeMenu(QTreeWidget):
@@ -143,7 +143,11 @@ class TocTreeMenu(QTreeWidget):
     def on_item_changed(self):
         item = self.currentItem()
         new_title = item.text(0)
-        link = item.data(0, Qt.UserRole).toString()
+        # print new_title
+        link = item.data(0, Qt.UserRole)
+        if not isinstance(link, unicode):
+            link = item.data(0, Qt.UserRole).toString()
+        # print link
         self.xml_util.change_title(new_title, link)
         contents_data = self.xml_util.xml_point_attributes('toc')
         self.blockSignals(True)
