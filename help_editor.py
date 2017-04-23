@@ -42,7 +42,7 @@ from __init__ import (
     LANGUAGE_DOC,
     HOME,
     STDM_VERSIONS,
-    CURRENT_FILE,
+    CURRENT_FILE_DOC,
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
@@ -86,7 +86,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.content_editor.dropEvent = self.on_help_editor_item_drop
         # Start with the first page if current_file.js doesn't exist
 
-        if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
+        if not os.path.isfile(CURRENT_FILE_DOC) or self._current_file is None:
             self.switch_table_of_content('preface.htm')
             if hasattr(self.toc, 'widget_items'):
                 self.current_item = self.toc.widget_items['preface.htm']
@@ -105,7 +105,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
 
     def read_current_file(self):
-        string = open(CURRENT_FILE, 'r').read()
+        string = open(CURRENT_FILE_DOC, 'r').read()
         list_str = string.split('=')
         if len(list_str) > 1:
             json_data = list_str[1].strip().rstrip(';')
@@ -424,6 +424,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.setWindowTitle(
             'STDM Documentation Editor - {}'.format(self._curr_title)
         )
+        print current_doc, current_title
         self.content_editor.blockSignals(True)
         self.load_content_js()
         self.content_editor.blockSignals(False)
@@ -436,7 +437,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         file_name = os.path.basename(self._curr_file_path).split('.')[0]
         self._curr_file_path_js = '{}/{}.js'.format(self.language_doc,
                                                     file_name)
-        output_file = open(CURRENT_FILE, 'w')
+        output_file = open(CURRENT_FILE_DOC, 'w')
 
         self._current_file = {
             "current": str(self._curr_file_path),
@@ -573,7 +574,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         url = QUrl.fromLocalFile(PREVIEW_URL)
         service.openUrl(url)
 
-class OrderedJsonEncoder( simplejson.JSONEncoder ):
+class OrderedJsonEncoder(simplejson.JSONEncoder):
    def encode(self, data):
       if isinstance(data, OrderedDict):
          return "{" + ",".join(

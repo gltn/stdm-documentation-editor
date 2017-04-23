@@ -22,7 +22,7 @@ IMAGE_TYPES = {
     'bmp': '*.bmp', 'svg': '*.svg'
 }
 DOC = 'docs'
-
+WEB_EDITOR = 'web_editor'
 DEFAULT_VERSION = '1_5'
 HTML_EXTENSION = '.htm'
 LANGUAGE_DOC = '{}/{}'.format(DEFAULT_VERSION, LANGUAGE)
@@ -31,7 +31,8 @@ LANGUAGE_DOC_HTML = '{}/{}/{}'.format(PLUGIN_DIR, DOC, LANGUAGE_DOC)
 GALLERY_LIST_JS = '{}/{}/gallery_list.js'.format(PLUGIN_DIR, DOC)
 IMAGE_JS = '{}/{}/images.js'.format(PLUGIN_DIR, DOC)
 HELP_EDITOR_HTML = '{}/{}/help.html'.format(PLUGIN_DIR, DOC)
-CURRENT_FILE = '{}/{}/current_file.js'.format(PLUGIN_DIR, DOC)
+CURRENT_FILE_DOC = '{}/{}/current_file.js'.format(PLUGIN_DIR, DOC)
+# CURRENT_FILE_EDITOR = '{}/{}/current_file.js'.format(PLUGIN_DIR, DOC)
 IMAGE_BROWSER_HTML = '{}/image_browser.html'.format(PLUGIN_DIR, DOC)
 
 STDM_VERSIONS = OrderedDict([('1_5', 'STDM 1.5')

@@ -26,7 +26,7 @@ class StdmDocumentationEditor(object):
         """
         self.action = QAction(
             QIcon('{}/images/icon.png'.format(PLUGIN_DIR)),
-            'Batch GPS Importer', self.iface.mainWindow()
+            'STDM Documentation Editor', self.iface.mainWindow()
         )
         self.action.setObjectName('stdm_documentation_editor')
         self.action.setWhatsThis('STDM Documentation Editor')

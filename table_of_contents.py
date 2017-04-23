@@ -142,7 +142,11 @@ class TocTreeMenu(QTreeWidget):
     def on_item_changed(self):
         item = self.currentItem()
         new_title = item.text(0)
-        link = item.data(0, Qt.UserRole).toString()
+        # print new_title
+        link = item.data(0, Qt.UserRole)
+        if not isinstance(link, unicode):
+            link = item.data(0, Qt.UserRole).toString()
+        # print link
         self.xml_util.change_title(new_title, link)
         contents_data = self.xml_util.xml_point_attributes('toc')
         self.blockSignals(True)
