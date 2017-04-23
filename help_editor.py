@@ -479,8 +479,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         output_file.close()
 
     def load_content_js(self):
-<<<<<<< HEAD
-=======
         if hasattr(self.toc, 'widget_items'):
             js = """
                 jQuery(document).ready(function() {
@@ -493,13 +491,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     jQuery(document).trigger('errorChangeEvent', '%s');
                 });
             """ % NO_DOCS_ERROR
->>>>>>> master
 
-        js = """
-            jQuery(document).ready(function() {
-                jQuery(document).trigger('customChangeEvent', %s);
-            });
-        """ % self._current_file
         QApplication.processEvents()
         self.web_frame.evaluateJavaScript(js)
 
