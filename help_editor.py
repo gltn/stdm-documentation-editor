@@ -2,20 +2,20 @@ import glob
 import json
 import os
 import re
-import shutil
+
 import sys
 import zipfile
-from HTMLParser import HTMLParser
+
 from collections import OrderedDict
 
 import simplejson as simplejson
-from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QIcon
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtGui import QMessageBox
 from PyQt4.QtGui import QProgressDialog
@@ -30,7 +30,7 @@ from utils import (
     copy_directory,
     format_html
 )
-from settings import (
+from __init__ import (
     IMAGE_TYPES,
     PLUGIN_DIR,
     HELP_EDITOR_HTML,
@@ -40,8 +40,6 @@ from settings import (
     IMAGES,
     IMG_PARAM,
     LANGUAGE_DOC,
-    LANG_SETTING_FILE,
-    TABLE_OF_CONTENT_JS,
     HOME,
     STDM_VERSIONS,
     CURRENT_FILE,
@@ -53,13 +51,15 @@ from settings import (
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
-    def __init__(self):
-        QMainWindow.__init__(self)
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self._curr_file_path = None
         self._curr_file_path_js = None
         self._curr_title = None
         self.current_item = None
+
+        self.setWindowIcon(QIcon('{}/images/icon.png'.format(PLUGIN_DIR)))
         get_images(LANGUAGE_DOC)
         get_gallery_images(LANGUAGE_DOC)
         self.help_path = os.path.join(PLUGIN_DIR, HELP_EDITOR_HTML)
@@ -134,7 +134,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
               });
         """ % fixed_html
         QApplication.processEvents()
-        self.web_frame.evaluateJavaScript(QString(js))
+        self.web_frame.evaluateJavaScript(js)
 
     def init_gui(self):
         self.statusbar.hide()
@@ -411,7 +411,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
     def get_item_url(self, item, col=0):
         self._prev_file_path = self._curr_file_path
-        current_doc = item.data(col, Qt.UserRole).toString()
+        current_doc = item.data(col, Qt.UserRole)
+        if not isinstance(current_doc, unicode):
+            current_doc = item.data(col, Qt.UserRole).toString()
         current_title = str(item.text(col))
         QApplication.processEvents()
         if self.current_item is not None:
@@ -467,7 +469,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             """ % NO_DOCS_ERROR
 
         QApplication.processEvents()
-        self.web_frame.evaluateJavaScript(QString(js))
+        self.web_frame.evaluateJavaScript(js)
 
     def load_image(self, destination_file):
 
@@ -582,6 +584,6 @@ class OrderedJsonEncoder( simplejson.JSONEncoder ):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = HelpEditor()
+    window = HelpEditor(None)
     window.show()
     sys.exit(app.exec_())

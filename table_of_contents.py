@@ -10,7 +10,7 @@ from PyQt4.QtGui import QTreeWidget
 from PyQt4.QtGui import QTreeWidgetItem
 
 from xml_util import XmlUtil
-from settings import (
+from __init__ import (
     TABLE_OF_CONTENT_HTML,
     TABLE_OF_CONTENT_XML,
     TABLE_OF_CONTENT_JS)

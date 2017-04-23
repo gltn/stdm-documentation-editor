@@ -12,7 +12,7 @@ from xml.dom import minidom
 import json
 import sys
 
-from settings import (
+from __init__ import (
     IMAGE_TYPES,
     LANGUAGE_DOC,
     IMAGES,
