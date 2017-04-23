@@ -8,14 +8,10 @@ import zipfile
 
 from collections import OrderedDict
 
-<<<<<<< HEAD
 try: import simplejson as simplejson
 except ImportError:import json as simplejson
 
 from PyQt4.QtCore import QString
-=======
-import simplejson as simplejson
->>>>>>> master
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import pyqtSignal
@@ -54,12 +50,8 @@ from __init__ import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
-<<<<<<< HEAD
-    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML)
-=======
     LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
     NO_DOCS_ERROR, PREFACE_TITLE)
->>>>>>> master
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
