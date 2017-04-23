@@ -27,6 +27,7 @@ from utils import get_images, get_gallery_images, get_next_name
 from table_of_contents import TocTreeMenu
 from ui.add_language import AddLanguage
 from ui.ui_help_editor import Ui_HelpEditor
+
 from utils import (
     copy_file,
     copy_directory,
@@ -50,8 +51,7 @@ from settings import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
-    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
-    NO_LANG_ERROR)
+    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML)
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
@@ -98,12 +98,10 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
             if bool(self.toc.widget_items):
                 self.switch_table_of_content(self.start_page)
-                if hasattr(self.toc, 'widget_items'):
-                    self.current_item = self.toc.widget_items[self.start_page]
-                    title = str(self.current_item.text(0))
-                    self.set_current_file(self.start_page, title)
-                    self.toc.setCurrentItem(self.current_item)
-                    return
+                self.current_item = self.toc.widget_items[self.start_page]
+                title = str(self.current_item.text(0))
+                self.set_current_file(self.start_page, title)
+                self.toc.setCurrentItem(self.current_item)
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())
@@ -164,13 +162,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.add_language_cbo.clicked.connect(self.on_add_language)
         self.image_browse_btn.clicked.connect(self.file_dialog)
         self.window_loaded.connect(self.on_widow_loaded)
-
-        # Download/clone
-        self.action_download.triggered.connect(self.on_download_repo)
-        #
-
+        
         self.action_preview.triggered.connect(self.on_preview_in_browser)
         self.action_export_zip.triggered.connect(self.export_doc_to_zip)
+        self.action_download.triggered.connect(self.on_download_repo)
+
+        
         self.populate_languages()
         self.populate_stdm_version()
 
@@ -243,12 +240,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.toc.update_contents_path(
                 self.full_language_dir, updated_info
             )
-            if hasattr(self.toc, 'widget_items'):
-                current_widget_item = self.toc.widget_items[prev_toc_link]
-                self.toc.setCurrentItem(current_widget_item)
-                current_title = str(current_widget_item.text(0))
-                self.set_current_file(prev_toc_link, current_title)
-                self.get_item_url(current_widget_item)
+
+            current_widget_item = self.toc.widget_items[prev_toc_link]
+            self.toc.setCurrentItem(current_widget_item)
+            current_title = str(current_widget_item.text(0))
+            self.set_current_file(prev_toc_link, current_title)
+            self.get_item_url(current_widget_item)
 
     def copy_language(self):
         prev_language_dir = os.path.join(
@@ -465,13 +462,12 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         output_file.close()
 
     def load_content_js(self):
-        if hasattr(self.toc, 'widget_items'):
-            js = """
-                jQuery(document).ready(function() {
-                    jQuery(document).trigger('customChangeEvent', %s);
-                });
-            """ % self._current_file
 
+        js = """
+            jQuery(document).ready(function() {
+                jQuery(document).trigger('customChangeEvent', %s);
+            });
+        """ % self._current_file
         QApplication.processEvents()
         self.web_frame.evaluateJavaScript(QString(js))
 
@@ -487,7 +483,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             findFirst("ul").prependInside(html)
 
     def on_editor_loaded(self):
-        # TODO create a generic function to set html/file into the content editor
+
         help_url = QUrl()
 
         help_url.setPath(self.help_path)
@@ -576,7 +572,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.create_js_doc()
         url = QUrl.fromLocalFile(PREVIEW_URL)
         service.openUrl(url)
-
+    
     def on_download_repo(self):
         from git_editor import CloneEditor
         editor = CloneEditor(self)

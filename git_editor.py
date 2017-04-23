@@ -30,7 +30,7 @@ from settings import (
 from ui.clone_editor import Ui_CloneEditor
 
 # DOC_CLONE_DIR = 'STDMdocs'
-DOC_CLONE_DIR = 'home\\QGISApp\\STDM\\dev\\SDE\\doctest2'
+DOC_CLONE_DIR = 'home\\QGISApp\\STDM\\dev\\SDE\\doctest4'
 REMOTE_REPO='https://github.com/gltn/stdm-documentation.git'
 
 class ProgressPrinter(RemoteProgress):
@@ -133,14 +133,17 @@ class CloneEditor(QDialog, Ui_CloneEditor):
         self.btnClone.clicked.connect(self.clone_repo)
 
     def clone_repo(self):
-        self.clone_update = QThread(self)
-        self.git_wrap.moveToThread(self.clone_update)
-        self.git_wrap.clone_started.connect(self.start_clone)
-        self.git_wrap.update_progress.connect(self.clone_updates)
+        self.lblStatus.setText('Download documentation ...')
+        QApplication.processEvents()
+        self.git_wrap.clone()
+        self.lblStatus.setText('Download complete.')
 
-        self.clone_update.started.connect(self._clone_start)
-
-        self.clone_update.start()
+        #self.clone_update = QThread(self)
+        #self.git_wrap.moveToThread(self.clone_update)
+        #self.git_wrap.clone_started.connect(self.start_clone)
+        #self.git_wrap.update_progress.connect(self.clone_updates)
+        #self.clone_update.started.connect(self._clone_start)
+        #self.clone_update.start()
 
     def _clone_start(self):
         sys.stdout = self.clone_updates

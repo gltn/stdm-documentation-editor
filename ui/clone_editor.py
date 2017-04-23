@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'clone_editor.ui'
 #
-# Created: Fri Apr 21 11:41:16 2017
+# Created: Sun Apr 23 13:02:24 2017
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,29 +26,32 @@ except AttributeError:
 class Ui_CloneEditor(object):
     def setupUi(self, CloneEditor):
         CloneEditor.setObjectName(_fromUtf8("CloneEditor"))
-        CloneEditor.resize(425, 199)
-        self.verticalLayout = QtGui.QVBoxLayout(CloneEditor)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.label = QtGui.QLabel(CloneEditor)
-        self.label.setObjectName(_fromUtf8("label"))
-        self.verticalLayout.addWidget(self.label)
-        self.edtOut = QtGui.QTextEdit(CloneEditor)
-        self.edtOut.setObjectName(_fromUtf8("edtOut"))
-        self.verticalLayout.addWidget(self.edtOut)
-        self.horizontalLayout = QtGui.QHBoxLayout()
+        CloneEditor.resize(317, 78)
+        self.lblStatus = QtGui.QLabel(CloneEditor)
+        self.lblStatus.setGeometry(QtCore.QRect(10, 10, 161, 16))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblStatus.setFont(font)
+        self.lblStatus.setTextFormat(QtCore.Qt.RichText)
+        self.lblStatus.setObjectName(_fromUtf8("lblStatus"))
+        self.layoutWidget = QtGui.QWidget(CloneEditor)
+        self.layoutWidget.setGeometry(QtCore.QRect(180, 40, 123, 25))
+        self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
+        self.horizontalLayout = QtGui.QHBoxLayout(self.layoutWidget)
+        self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.btnClone = QtGui.QPushButton(CloneEditor)
+        self.btnClone = QtGui.QPushButton(self.layoutWidget)
         self.btnClone.setObjectName(_fromUtf8("btnClone"))
         self.horizontalLayout.addWidget(self.btnClone)
-        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.retranslateUi(CloneEditor)
         QtCore.QMetaObject.connectSlotsByName(CloneEditor)
 
     def retranslateUi(self, CloneEditor):
         CloneEditor.setWindowTitle(_translate("CloneEditor", "Dialog", None))
-        self.label.setText(_translate("CloneEditor", "Download documentation", None))
+        self.lblStatus.setText(_translate("CloneEditor", "Download documentation", None))
         self.btnClone.setText(_translate("CloneEditor", "Download", None))
 
