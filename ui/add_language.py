@@ -16,6 +16,26 @@ class AddLanguage(QDialog, Ui_AddLanguage):
         self._help_editor = parent
         self.setupUi(self)
         self.populate_languages()
+        self.toolBox.setStyleSheet(
+            '''
+            QToolBox::tab {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 #EDEDED, stop: 0.4 #EDEDED,
+                    stop: 0.5 #EDEDED, stop: 1.0 #D3D3D3
+                );
+                border-radius: 2px;
+                border-style: outset;
+                border-width: 2px;
+                height: 100px;
+                border-color: #C3C3C3;
+            }
+
+            QToolBox::tab:selected {
+                font: italic;
+            }
+            '''
+        )
 
     def populate_languages(self):
         from ..__init__ import LANGUAGES, PLUGIN_DIR, DOC
@@ -37,8 +57,10 @@ class AddLanguage(QDialog, Ui_AddLanguage):
         elif str(self.select_language_cbo.currentText()) != '' and \
             self.toolBox.currentIndex() == 0:
             curr_index = self.select_language_cbo.currentIndex()
-            lang_code = str(
-                self.select_language_cbo.itemData(curr_index).toString())
+            curr_data = self.select_language_cbo.itemData(curr_index)
+            if not isinstance(curr_data, unicode):
+                curr_data = curr_data.toString()
+            lang_code = str(curr_data)
             lang_name = str(self.select_language_cbo.currentText())
             self.set_language(lang_name, lang_code)
             self._help_editor.language_cbo.addItem(lang_name, lang_code)
@@ -58,6 +80,7 @@ class AddLanguage(QDialog, Ui_AddLanguage):
         lang_file.close()
         lang_file = open(LANG_SETTING_FILE, 'w+')
         lang_file.write(updated_lang_list)
+        print updated_lang_list
         lang_file.close()
 
     def accept(self):

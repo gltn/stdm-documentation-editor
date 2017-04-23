@@ -102,11 +102,8 @@
         }
 
         function load_custom_html(html_path){
-            console.log(html_path);
             $.get(html_path, function (content) {
-                console.log(content);
                 editor.setData(content);
-                console.log(content);
             })
         }
 
@@ -116,13 +113,16 @@
                 var body = content.replace(/^[\S\s]*<body[^>]*?>/i, "")
                     .replace(/<\/body[\S\s]*$/i, "");
                 body = prod_to_dev_image_url(html_data, body);
+//                editor.resetUndo();
                 if (!ajax) {
+
                     editor.setData(body);
                 }
                 else {
                     $('body.cke_editable').load(body);
 
                 }
+                editor.undoManager.reset();
             });
         }
 
@@ -191,7 +191,6 @@
                 'instanceReady': function (evt) {
                     evt.editor.execCommand('maximize');
                     editor.on('paste', function (evt) {
-
                         img_absolute_to_relative(evt);
                     });
                     editor.document.on('dragenter', function (evt) {
@@ -227,7 +226,6 @@
         });
         // Add an event listener.
         $(document).on('errorChangeEvent', function (e, data) {
-            console.log(data);
             load_custom_html(data);
 
         });

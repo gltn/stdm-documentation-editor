@@ -9,7 +9,7 @@ from . import PLUGIN_DIR
 class StdmDocumentationEditor(object):
     """
     StdmDocumentationEditor initializes the whole plugin and adds the plugin
-    on toolbar of GGIS.
+    on toolbar of QGIS.
     """
     def __init__(self, iface):
         """

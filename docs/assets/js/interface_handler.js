@@ -1,4 +1,4 @@
-
+localStorage.clear();
     function insert_js_docs() {
         for (var j = 0; j < js_doc_files.length; j++) {
             var doc_script = document.createElement('script');
@@ -162,10 +162,10 @@
 
         });
 
-       $('#refresh2').on("click", function () {
-           localStorage.clear();
-           location.reload();
-       });
+       // $('#refresh2').on("click", function () {
+       //     localStorage.clear();
+       //     location.reload();
+       // });
         $("#left").css({'height': (window.innerHeight - 90) + "px"});
 
     });

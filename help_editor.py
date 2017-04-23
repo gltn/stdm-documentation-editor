@@ -11,7 +11,6 @@ from collections import OrderedDict
 try: import simplejson as simplejson
 except ImportError:import json as simplejson
 
-from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import pyqtSignal
@@ -174,9 +173,14 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.action_export_zip.triggered.connect(self.export_doc_to_zip)
         self.action_download.triggered.connect(self.on_download_repo)
 
-        
         self.populate_languages()
         self.populate_stdm_version()
+        # self.language_cbo.currentIndexChanged.connect(
+        #     self.on_language_switched
+        # )
+        # self.stdm_version_cbo.currentIndexChanged.connect(
+        #     self.on_version_switched
+        # )
 
     def init_table_of_contents(self):
         self.toc = TocTreeMenu(self.full_language_dir)
@@ -192,6 +196,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.window_loaded.emit()
 
     def on_widow_loaded(self):
+        print 'window loaded'
         self.language_cbo.currentIndexChanged.connect(
             self.on_language_switched
         )
@@ -218,15 +223,19 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.switch_table_of_content(prev_toc_link)
 
     def on_language_switched(self, index, version_switch=False):
+        print self.prev_language_code
+        print 'test'
         self.prev_language_code = self.current_lang_code
         self.prev_language_name = self.current_lang_name
-        prev_toc_link = str(self.current_item.data(
-            0, Qt.UserRole).toString()
-        )
-
-        self.current_lang_code = str(
-            self.language_cbo.itemData(index).toString()
-        )
+        item_data = self.current_item.data(
+            0, Qt.UserRole)
+        if not isinstance(item_data, unicode):
+            item_data = item_data.toString()
+        prev_toc_link = str(item_data)
+        lang_data = self.language_cbo.itemData(index)
+        if not isinstance(lang_data, unicode):
+            lang_data = lang_data.toString()
+        self.current_lang_code = str(lang_data)
         self.current_lang_name = str(self.language_cbo.currentText())
         if self.current_lang_code not in self.added_languages.keys():
             self.added_languages[self.current_lang_code] = \
@@ -242,6 +251,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.create_added_languages_js()
 
     def switch_table_of_content(self, prev_toc_link):
+
         if self.toc is not None:
             updated_info = [self.current_version, self.current_lang_code]
             self.toc.update_contents_path(
@@ -258,6 +268,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         prev_language_dir = os.path.join(
             PLUGIN_DIR, DOC, self.current_version, self.prev_language_code
         )
+        print prev_language_dir
+        print self.full_language_dir
         if not os.path.isdir(self.full_language_dir):
             copy_directory(prev_language_dir, self.full_language_dir)
 
@@ -441,7 +453,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.setWindowTitle(
             'STDM Documentation Editor - {}'.format(self._curr_title)
         )
-        print current_doc, current_title
+
         self.content_editor.blockSignals(True)
         self.load_content_js()
         self.content_editor.blockSignals(False)
