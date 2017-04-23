@@ -33,7 +33,7 @@ IMAGE_JS = '{}/{}/images.js'.format(PLUGIN_DIR, DOC)
 HELP_EDITOR_HTML = '{}/{}/help.html'.format(PLUGIN_DIR, DOC)
 CURRENT_FILE_DOC = '{}/{}/current_file.js'.format(PLUGIN_DIR, DOC)
 # CURRENT_FILE_EDITOR = '{}/{}/current_file.js'.format(PLUGIN_DIR, DOC)
-IMAGE_BROWSER_HTML = '{}/image_browser.html'.format(PLUGIN_DIR, DOC)
+IMAGE_BROWSER_HTML = '{}/{}/image_browser.html'.format(PLUGIN_DIR, DOC)
 
 STDM_VERSIONS = OrderedDict([('1_5', 'STDM 1.5')
                              ])

@@ -509,7 +509,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
     def on_show_gallery(self):
         help_url = QUrl()
-        help_path = os.path.join(PLUGIN_DIR, IMAGE_BROWSER_HTML)
+        help_path = os.path.join(IMAGE_BROWSER_HTML)
         help_url.setPath(help_path)
         self.image_browser.load(help_url)
 
