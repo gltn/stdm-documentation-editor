@@ -71,7 +71,6 @@
                 return image_name
             }
             else {
-                console.log(_img + '_' + next_number + '.' + ext);
                 return _img + '_' + next_number + '.' + ext;
             }
         }
@@ -100,6 +99,15 @@
                 '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
                 '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
             return pattern.test(str);
+        }
+
+        function load_custom_html(html_path){
+            console.log(html_path);
+            $.get(html_path, function (content) {
+                console.log(content);
+                editor.setData(content);
+                console.log(content);
+            })
         }
 
         function load_content(html_data, ajax) {
@@ -139,7 +147,6 @@
             var elem = document.createElement("div");
             elem.innerHTML = evt.data.dataValue;
             var images = elem.getElementsByTagName("img");
-            console.log('pasted_1', evt.data.dataValue);
 
             for (var i = 0; i < images.length; i++) {
                 var old_src = images[i].src;
@@ -184,7 +191,7 @@
                 'instanceReady': function (evt) {
                     evt.editor.execCommand('maximize');
                     editor.on('paste', function (evt) {
-                        console.log('pasted');
+
                         img_absolute_to_relative(evt);
                     });
                     editor.document.on('dragenter', function (evt) {
@@ -216,6 +223,12 @@
         // Add an event listener.
         $(document).on('customChangeEvent', function (e, data) {
             load_content(data, false);
+
+        });
+        // Add an event listener.
+        $(document).on('errorChangeEvent', function (e, data) {
+            console.log(data);
+            load_custom_html(data);
 
         });
         $(document).on('customDropEvent', function (e, data) {

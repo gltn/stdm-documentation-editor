@@ -2,20 +2,20 @@ import glob
 import json
 import os
 import re
-import shutil
+
 import sys
 import zipfile
-from HTMLParser import HTMLParser
+
 from collections import OrderedDict
 
 import simplejson as simplejson
-from PyQt4.QtCore import QString
 from PyQt4.QtCore import QUrl
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QIcon
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtGui import QMessageBox
 from PyQt4.QtGui import QProgressDialog
@@ -30,7 +30,7 @@ from utils import (
     copy_directory,
     format_html
 )
-from settings import (
+from __init__ import (
     IMAGE_TYPES,
     PLUGIN_DIR,
     HELP_EDITOR_HTML,
@@ -40,26 +40,26 @@ from settings import (
     IMAGES,
     IMG_PARAM,
     LANGUAGE_DOC,
-    LANG_SETTING_FILE,
-    TABLE_OF_CONTENT_JS,
     HOME,
     STDM_VERSIONS,
-    CURRENT_FILE,
+    CURRENT_FILE_DOC,
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
     LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
-    NO_LANG_ERROR)
+    NO_DOCS_ERROR, PREFACE_TITLE)
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
-    def __init__(self):
-        QMainWindow.__init__(self)
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self._curr_file_path = None
         self._curr_file_path_js = None
         self._curr_title = None
         self.current_item = None
+
+        self.setWindowIcon(QIcon('{}/images/icon.png'.format(PLUGIN_DIR)))
         get_images(LANGUAGE_DOC)
         get_gallery_images(LANGUAGE_DOC)
         self.help_path = os.path.join(PLUGIN_DIR, HELP_EDITOR_HTML)
@@ -86,14 +86,15 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.content_editor.dropEvent = self.on_help_editor_item_drop
         # Start with the first page if current_file.js doesn't exist
 
-        if not os.path.isfile(CURRENT_FILE) or self._current_file is None:
+        if not os.path.isfile(CURRENT_FILE_DOC) or self._current_file is None:
             self.switch_table_of_content('preface.htm')
             if hasattr(self.toc, 'widget_items'):
                 self.current_item = self.toc.widget_items['preface.htm']
-                title = str(self.current_item.text(0))
-                self.set_current_file('preface.htm', title)
                 self.toc.setCurrentItem(self.current_item)
-                return
+                self.set_current_file('preface.htm', PREFACE_TITLE)
+            else:
+                self.load_content_js()
+
         else:
             self.read_current_file()
             self.toc.expandItem(self.current_item.parent())
@@ -102,8 +103,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 'STDM Documentation Editor - {}'.format(self._curr_title)
             )
 
+
     def read_current_file(self):
-        string = open(CURRENT_FILE, 'r').read()
+        string = open(CURRENT_FILE_DOC, 'r').read()
         list_str = string.split('=')
         if len(list_str) > 1:
             json_data = list_str[1].strip().rstrip(';')
@@ -132,7 +134,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
               });
         """ % fixed_html
         QApplication.processEvents()
-        self.web_frame.evaluateJavaScript(QString(js))
+        self.web_frame.evaluateJavaScript(js)
 
     def init_gui(self):
         self.statusbar.hide()
@@ -409,7 +411,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
     def get_item_url(self, item, col=0):
         self._prev_file_path = self._curr_file_path
-        current_doc = item.data(col, Qt.UserRole).toString()
+        current_doc = item.data(col, Qt.UserRole)
+        if not isinstance(current_doc, unicode):
+            current_doc = item.data(col, Qt.UserRole).toString()
         current_title = str(item.text(col))
         QApplication.processEvents()
         if self.current_item is not None:
@@ -420,6 +424,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.setWindowTitle(
             'STDM Documentation Editor - {}'.format(self._curr_title)
         )
+        print current_doc, current_title
         self.content_editor.blockSignals(True)
         self.load_content_js()
         self.content_editor.blockSignals(False)
@@ -432,7 +437,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         file_name = os.path.basename(self._curr_file_path).split('.')[0]
         self._curr_file_path_js = '{}/{}.js'.format(self.language_doc,
                                                     file_name)
-        output_file = open(CURRENT_FILE, 'w')
+        output_file = open(CURRENT_FILE_DOC, 'w')
 
         self._current_file = {
             "current": str(self._curr_file_path),
@@ -446,6 +451,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             'images_folder': IMAGES,
             'search_data': '{}/{}'.format(self.language_doc, SEARCH_DATA_JS)
         }
+        QApplication.processEvents()
         output_file.write('var html_file = {};'.format(self._current_file))
         output_file.close()
 
@@ -456,9 +462,15 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                     jQuery(document).trigger('customChangeEvent', %s);
                 });
             """ % self._current_file
+        else:
+            js = """
+                jQuery(document).ready(function() {
+                    jQuery(document).trigger('errorChangeEvent', '%s');
+                });
+            """ % NO_DOCS_ERROR
 
         QApplication.processEvents()
-        self.web_frame.evaluateJavaScript(QString(js))
+        self.web_frame.evaluateJavaScript(js)
 
     def load_image(self, destination_file):
 
@@ -562,7 +574,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         url = QUrl.fromLocalFile(PREVIEW_URL)
         service.openUrl(url)
 
-class OrderedJsonEncoder( simplejson.JSONEncoder ):
+class OrderedJsonEncoder(simplejson.JSONEncoder):
    def encode(self, data):
       if isinstance(data, OrderedDict):
          return "{" + ",".join(
@@ -573,6 +585,6 @@ class OrderedJsonEncoder( simplejson.JSONEncoder ):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = HelpEditor()
+    window = HelpEditor(None)
     window.show()
     sys.exit(app.exec_())

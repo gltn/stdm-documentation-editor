@@ -1,0 +1,21 @@
+[general]
+name=STDM Documentation Editor
+qgisMinimumVersion=2.14
+description=A QGIS plugin for editing the Social Tenure Domain Model (STDM) end-user manual.
+version=0.1
+
+tags=documentation, help, STDM, land administration, tenure security, continuum of land rights, fit for purpose land administration
+
+homepage=http://www.stdm.gltn.net/
+tracker=https://github.com/gltn/stdm/issues
+repository=https://github.com/gltn/stdm
+icon=images/icon.png
+
+experimental=False
+
+author=Global Land Tool Network
+email=stdm@unhabitat.org
+
+
+
+
