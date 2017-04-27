@@ -1,13 +1,10 @@
 #!C:/Python27/python.exe
 import glob
-import json
-import os
 import os
 import re
 import shutil
 from HTMLParser import HTMLParser
-from collections import OrderedDict
-from os.path import expanduser
+
 from xml.dom import minidom
 import json
 import sys
@@ -72,8 +69,6 @@ def get_gallery_images(lang_dir):
     with open(GALLERY_LIST_JS, 'w+') as outfile:
         print >> outfile, json_data
 
-# print(json.JSONEncoder().encode(get_images(LANGUAGE_DOC)))
-
 
 def format_html(full_html_text):
     # Read the file and decode html entities
@@ -124,3 +119,4 @@ def get_next_name(file_name, path):
         if not os.path.exists(new_path):
             return new_path
         i += 1
+

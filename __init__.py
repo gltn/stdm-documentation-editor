@@ -5,7 +5,7 @@ from os.path import expanduser
 import json
 
 PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
-LANG_SETTING_FILE = '{}\languages.txt'.format(PLUGIN_DIR)
+LANG_SETTING_FILE = '{}/languages.txt'.format(PLUGIN_DIR)
 LANG_FILE = open(LANG_SETTING_FILE, 'r')
 LANG_SETTING = LANG_FILE.read()
 

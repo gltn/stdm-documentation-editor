@@ -2,18 +2,20 @@ import json
 import os
 import cStringIO
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView
-from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QHeaderView
-
-from PyQt4.QtGui import QTreeWidget
-from PyQt4.QtGui import QTreeWidgetItem
+from PyQt4.QtGui import (
+    QAbstractItemView,
+    QHeaderView,
+    QTreeWidget,
+    QTreeWidgetItem
+)
 
 from xml_util import XmlUtil
 from __init__ import (
     TABLE_OF_CONTENT_HTML,
     TABLE_OF_CONTENT_XML,
-    TABLE_OF_CONTENT_JS)
+    TABLE_OF_CONTENT_JS,
+    PLUGIN_DIR
+)
 
 
 class TocTreeMenu(QTreeWidget):

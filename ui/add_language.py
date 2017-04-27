@@ -80,7 +80,7 @@ class AddLanguage(QDialog, Ui_AddLanguage):
         lang_file.close()
         lang_file = open(LANG_SETTING_FILE, 'w+')
         lang_file.write(updated_lang_list)
-        print updated_lang_list
+
         lang_file.close()
 
     def accept(self):

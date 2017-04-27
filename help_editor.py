@@ -11,16 +11,18 @@ from collections import OrderedDict
 try: import simplejson as simplejson
 except ImportError:import json as simplejson
 
-from PyQt4.QtCore import QUrl
-from PyQt4.QtCore import Qt
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QDesktopServices
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QIcon
-from PyQt4.QtGui import QMainWindow
-from PyQt4.QtGui import QMessageBox
-from PyQt4.QtGui import QProgressDialog
+from PyQt4.QtCore import QUrl, Qt, pyqtSignal
+
+from PyQt4.QtGui import (
+    QApplication,
+    QDesktopServices,
+    QFileDialog,
+    QIcon,
+    QMainWindow,
+    QMessageBox,
+    QProgressDialog
+)
+
 from PyQt4.QtWebKit import QWebSettings, QWebPage
 
 from utils import get_images, get_gallery_images, get_next_name
@@ -41,6 +43,8 @@ from __init__ import (
     DOC,
     DEFAULT_VERSION,
     IMAGES,
+    IMAGE_JS,
+    GALLERY_LIST_JS,
     IMG_PARAM,
     LANGUAGE_DOC,
     HOME,
@@ -49,8 +53,13 @@ from __init__ import (
     IMAGE_BROWSER_HTML,
     PREVIEW_URL,
     LIST_OF_JS_DOCS,
-    LANGUAGES_WITH_CONTENT, SEARCH_DATA_JS, TABLE_OF_CONTENT_HTML,
-    NO_DOCS_ERROR, PREFACE_TITLE)
+    LANGUAGES_WITH_CONTENT,
+    SEARCH_DATA_JS,
+    TABLE_OF_CONTENT_HTML,
+    NO_DOCS_ERROR,
+    PREFACE_TITLE
+)
+
 
 class HelpEditor(QMainWindow, Ui_HelpEditor):
     window_loaded = pyqtSignal()
@@ -64,7 +73,9 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
 
         self.setWindowIcon(QIcon('{}/images/icon.png'.format(PLUGIN_DIR)))
         get_images(LANGUAGE_DOC)
+
         get_gallery_images(LANGUAGE_DOC)
+
         self.help_path = os.path.join(PLUGIN_DIR, HELP_EDITOR_HTML)
         self.web_frame = self.content_editor.page().currentFrame()
         self.on_editor_loaded()
@@ -97,8 +108,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         # Start with the first page if current_file.js doesn't exist
 
         if not os.path.isfile(CURRENT_FILE_DOC) or self._current_file is None:
-            # print self.toc.widget_items
-            # # if len(self.toc.widget_items) > 0:
             self.switch_table_of_content('preface.htm')
             if hasattr(self.toc, 'widget_items'):
                 self.current_item = self.toc.widget_items['preface.htm']
@@ -114,7 +123,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
             self.setWindowTitle(
                 'STDM Documentation Editor - {}'.format(self._curr_title)
             )
-
 
     def read_current_file(self):
         string = open(CURRENT_FILE_DOC, 'r').read()
@@ -166,7 +174,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.centralWidget().layout().setContentsMargins(0,0,0,0)
         self.content_editor.urlChanged.connect(self.on_url_changed)
         self.add_language_cbo.clicked.connect(self.on_add_language)
-        self.image_browse_btn.clicked.connect(self.file_dialog)
+        self.image_browse_btn.clicked.connect(self.on_upload_images)
         self.window_loaded.connect(self.on_widow_loaded)
         
         self.action_preview.triggered.connect(self.on_preview_in_browser)
@@ -196,7 +204,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.window_loaded.emit()
 
     def on_widow_loaded(self):
-        print 'window loaded'
         self.language_cbo.currentIndexChanged.connect(
             self.on_language_switched
         )
@@ -223,8 +230,6 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.switch_table_of_content(prev_toc_link)
 
     def on_language_switched(self, index, version_switch=False):
-        print self.prev_language_code
-        print 'test'
         self.prev_language_code = self.current_lang_code
         self.prev_language_name = self.current_lang_name
         item_data = self.current_item.data(
@@ -249,6 +254,8 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         self.copy_language()
         self.switch_table_of_content(prev_toc_link)
         self.create_added_languages_js()
+        get_gallery_images(self.current_lang_code)
+        get_images(self.current_lang_code)
 
     def switch_table_of_content(self, prev_toc_link):
 
@@ -268,8 +275,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         prev_language_dir = os.path.join(
             PLUGIN_DIR, DOC, self.current_version, self.prev_language_code
         )
-        print prev_language_dir
-        print self.full_language_dir
+
         if not os.path.isdir(self.full_language_dir):
             copy_directory(prev_language_dir, self.full_language_dir)
 
@@ -288,7 +294,7 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
                 self.save_html_js_doc(data)
             # upload image
             else:
-                url_data = data.split('{} = '.format(IMG_PARAM))
+                url_data = data.split('{}='.format(IMG_PARAM))
                 if len(url_data) > 0:
                     self.save_local_images([url_data[1]])
 
@@ -300,11 +306,13 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         )
         formatted_html = format_html(full_html)
         html_file = open(
-            '{}/{}'.format(DOC, self._curr_file_path), 'w')
+            '{}/{}/{}'.format(PLUGIN_DIR, DOC, self._curr_file_path), 'w'
+        )
+
         html_file.write(formatted_html)
         html_file.close()
         json_data = json.dumps([formatted_html], ensure_ascii=False)
-        path = '{}/{}'.format(DOC, self._curr_file_path_js)
+        path = '{}/{}/{}'.format(PLUGIN_DIR, DOC, self._curr_file_path_js)
         file_name = os.path.basename(self._curr_file_path_js).split('.')[0]
         self.write_js_doc(file_name, json_data, path)
 
@@ -560,18 +568,22 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         )
         return str(path)
 
+    def on_upload_images(self):
+        files = self.file_dialog()
+        self.save_local_images(files)
+
     def save_local_images(self, files=None):
-        if files is None:
-            files = self.file_dialog()
         path = os.path.join(PLUGIN_DIR, DOC, self.language_doc, IMAGES)
         destination_files = []
         for file_path in files:
             destination_file = copy_file(file_path, path)
+
             destination_files.append(destination_file)
-        get_images(self.language_doc)
-        get_gallery_images(self.language_doc)
+
         for destination_file in destination_files:
             self.load_image(destination_file)
+        get_images(self.language_doc)
+        get_gallery_images(self.language_doc)
 
     def populate_languages(self):
         for code, language in LANGUAGES.iteritems():
@@ -608,17 +620,18 @@ class HelpEditor(QMainWindow, Ui_HelpEditor):
         editor = CloneEditor(self)
         editor.exec_()
 
-class OrderedJsonEncoder(simplejson.JSONEncoder):
-   def encode(self, data):
-      if isinstance(data, OrderedDict):
-         return "{" + ",".join(
-             [self.encode(k)+":"+self.encode(v) for (k,v) in data.iteritems()]
-         ) + "}"
-      else:
-         return simplejson.JSONEncoder.encode(self, data)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = HelpEditor(None)
-    window.show()
-    sys.exit(app.exec_())
+class OrderedJsonEncoder(simplejson.JSONEncoder):
+    def encode(self, data):
+        if isinstance(data, OrderedDict):
+            return "{" + ",".join(
+             [self.encode(k)+":"+self.encode(v) for (k,v) in data.iteritems()]
+            ) + "}"
+        else:
+            return simplejson.JSONEncoder.encode(self, data)
+#
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     window = HelpEditor(None)
+#     window.show()
+#     sys.exit(app.exec_())
